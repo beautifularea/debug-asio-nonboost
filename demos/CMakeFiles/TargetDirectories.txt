@@ -1,3 +1,0 @@
-/home/zhtian/asio-1.12.2/demos/CMakeFiles/rebuild_cache.dir
-/home/zhtian/asio-1.12.2/demos/CMakeFiles/edit_cache.dir
-/home/zhtian/asio-1.12.2/demos/CMakeFiles/demo.dir
