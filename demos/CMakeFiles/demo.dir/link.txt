@@ -1,0 +1,1 @@
+/usr/bin/c++   -std=c++0x  -rdynamic CMakeFiles/demo.dir/echo.cc.o  -o demo -lpthread 
