@@ -28,6 +28,7 @@
 #  include "asio/detail/win_thread.hpp"
 # endif
 #elif defined(ASIO_HAS_PTHREADS)
+# include <iostream>
 # include "asio/detail/posix_thread.hpp"
 #elif defined(ASIO_HAS_STD_THREAD)
 # include "asio/detail/std_thread.hpp"
@@ -49,8 +50,10 @@ typedef winapp_thread thread;
 typedef win_thread thread;
 # endif
 #elif defined(ASIO_HAS_PTHREADS)
+//std::cout << "--------------------------------使用了posix_thread-----------------------" << std::endl;
 typedef posix_thread thread;
 #elif defined(ASIO_HAS_STD_THREAD)
+std::cout << "--------------------------------使用了std::thread-----------------------" << std::endl;
 typedef std_thread thread;
 #endif
 

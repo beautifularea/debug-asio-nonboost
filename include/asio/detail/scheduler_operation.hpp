@@ -36,6 +36,8 @@ class scheduler_operation ASIO_INHERIT_TRACKED_HANDLER
 
         void complete(void* owner, const asio::error_code& ec, std::size_t bytes_transferred)
         {
+            std::cout << "scheduler_operation 回调函数, bytes_transferred : " << bytes_transferred  << std::endl;
+
             func_(owner, this, ec, bytes_transferred);
         }
 
