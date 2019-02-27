@@ -31,6 +31,8 @@ namespace asio {
 template <typename Service>
 inline Service& use_service(io_context& ioc)
 {
+    std::cout << "进入到Service 的 use_service方法。" << std::endl;
+
   // Check that Service meets the necessary type requirements.
   (void)static_cast<execution_context::service*>(static_cast<Service*>(0));
   (void)static_cast<const execution_context::id*>(&Service::id);
@@ -39,9 +41,10 @@ inline Service& use_service(io_context& ioc)
 }
 
 template <>
-inline detail::io_context_impl& use_service<detail::io_context_impl>(
-    io_context& ioc)
+inline detail::io_context_impl& use_service<detail::io_context_impl>(io_context& ioc)
 {
+    std::cout << "偏特化 use_service" << std::endl;
+
   return ioc.impl_;
 }
 
@@ -131,6 +134,8 @@ template <typename LegacyCompletionHandler>
 ASIO_INITFN_RESULT_TYPE(LegacyCompletionHandler, void ())
 io_context::dispatch(ASIO_MOVE_ARG(LegacyCompletionHandler) handler)
 {
+    std::cout << "进入到　io_context dispatch方法。" << std::endl;
+
   // If you get an error on the following line it means that your handler does
   // not meet the documented type requirements for a LegacyCompletionHandler.
   ASIO_LEGACY_COMPLETION_HANDLER_CHECK(

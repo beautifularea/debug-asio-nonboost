@@ -29,6 +29,7 @@ namespace detail {
 #if defined(ASIO_HAS_IOCP)
 typedef win_iocp_operation operation;
 #else
+//此处声明operation
 typedef scheduler_operation operation;
 #endif
 

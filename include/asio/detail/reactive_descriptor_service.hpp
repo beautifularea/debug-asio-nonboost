@@ -324,6 +324,8 @@ public:
   void async_read_some(implementation_type& impl,
       const MutableBufferSequence& buffers, Handler& handler)
   {
+    std::cout << "难道是这个async_read_some" << std::endl;
+
     bool is_continuation =
       asio_handler_cont_helpers::is_continuation(handler);
 
@@ -347,6 +349,8 @@ public:
   void async_read_some(implementation_type& impl,
       const null_buffers&, Handler& handler)
   {
+    std::cout << "肯定是这个async_read_some" << std::endl;
+
     bool is_continuation =
       asio_handler_cont_helpers::is_continuation(handler);
 

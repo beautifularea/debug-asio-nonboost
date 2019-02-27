@@ -49,9 +49,12 @@ io_context::io_context(int concurrency_hint)
 
 io_context::impl_type& io_context::add_impl(io_context::impl_type* impl)
 {
-  asio::detail::scoped_ptr<impl_type> scoped_impl(impl);
-  asio::add_service<impl_type>(*this, scoped_impl.get());
-  return *scoped_impl.release();
+    std::cout << "进入到 add_impl 方法。" << std::endl;
+
+    asio::detail::scoped_ptr<impl_type> scoped_impl(impl);
+    asio::add_service<impl_type>(*this, scoped_impl.get());
+
+    return *scoped_impl.release();
 }
 
 io_context::~io_context()
@@ -60,81 +63,86 @@ io_context::~io_context()
 
 io_context::count_type io_context::run()
 {
-  asio::error_code ec;
-  count_type s = impl_.run(ec);
-  asio::detail::throw_error(ec);
-  return s;
+    std::cout << "进入到 io_context run方法" << std::endl;
+
+    asio::error_code ec;
+
+    std::cout << "调用 impl . run方法。" << std::endl;
+    count_type s = impl_.run(ec);
+    asio::detail::throw_error(ec);
+
+    return s;
 }
 
 #if !defined(ASIO_NO_DEPRECATED)
 io_context::count_type io_context::run(asio::error_code& ec)
 {
-  return impl_.run(ec);
+    return impl_.run(ec);
 }
 #endif // !defined(ASIO_NO_DEPRECATED)
 
 io_context::count_type io_context::run_one()
 {
-  asio::error_code ec;
-  count_type s = impl_.run_one(ec);
-  asio::detail::throw_error(ec);
-  return s;
+    asio::error_code ec;
+    count_type s = impl_.run_one(ec);
+    asio::detail::throw_error(ec);
+    return s;
 }
 
 #if !defined(ASIO_NO_DEPRECATED)
 io_context::count_type io_context::run_one(asio::error_code& ec)
 {
-  return impl_.run_one(ec);
+    return impl_.run_one(ec);
 }
 #endif // !defined(ASIO_NO_DEPRECATED)
 
 io_context::count_type io_context::poll()
 {
-  asio::error_code ec;
-  count_type s = impl_.poll(ec);
-  asio::detail::throw_error(ec);
-  return s;
+    asio::error_code ec;
+    count_type s = impl_.poll(ec);
+    asio::detail::throw_error(ec);
+    return s;
 }
 
 #if !defined(ASIO_NO_DEPRECATED)
 io_context::count_type io_context::poll(asio::error_code& ec)
 {
-  return impl_.poll(ec);
+    return impl_.poll(ec);
 }
 #endif // !defined(ASIO_NO_DEPRECATED)
 
 io_context::count_type io_context::poll_one()
 {
-  asio::error_code ec;
-  count_type s = impl_.poll_one(ec);
-  asio::detail::throw_error(ec);
-  return s;
+    asio::error_code ec;
+    count_type s = impl_.poll_one(ec);
+    asio::detail::throw_error(ec);
+    return s;
 }
 
 #if !defined(ASIO_NO_DEPRECATED)
 io_context::count_type io_context::poll_one(asio::error_code& ec)
 {
-  return impl_.poll_one(ec);
+    return impl_.poll_one(ec);
 }
 #endif // !defined(ASIO_NO_DEPRECATED)
 
 void io_context::stop()
 {
-  impl_.stop();
+    impl_.stop();
 }
 
 bool io_context::stopped() const
 {
-  return impl_.stopped();
+    return impl_.stopped();
 }
 
 void io_context::restart()
 {
-  impl_.restart();
+    impl_.restart();
 }
 
-io_context::service::service(asio::io_context& owner)
-  : execution_context::service(owner)
+    io_context::service::service(asio::io_context& owner)
+: execution_context::service(owner)
 {
 }
 
@@ -145,7 +153,7 @@ io_context::service::~service()
 void io_context::service::shutdown()
 {
 #if !defined(ASIO_NO_DEPRECATED)
-  shutdown_service();
+    shutdown_service();
 #endif // !defined(ASIO_NO_DEPRECATED)
 }
 
@@ -158,9 +166,9 @@ void io_context::service::shutdown_service()
 void io_context::service::notify_fork(io_context::fork_event ev)
 {
 #if !defined(ASIO_NO_DEPRECATED)
-  fork_service(ev);
+    fork_service(ev);
 #else // !defined(ASIO_NO_DEPRECATED)
-  (void)ev;
+    (void)ev;
 #endif // !defined(ASIO_NO_DEPRECATED)
 }
 

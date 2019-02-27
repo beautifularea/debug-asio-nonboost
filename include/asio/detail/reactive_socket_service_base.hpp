@@ -332,26 +332,24 @@ public:
       const MutableBufferSequence& buffers,
       socket_base::message_flags flags, Handler& handler)
   {
-    bool is_continuation =
-      asio_handler_cont_helpers::is_continuation(handler);
+    std::cout << "detail/reactive_socket_service_base.hpp:331:i async_receive" << std::endl;
+
+    bool is_continuation = asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef reactive_socket_recv_op<MutableBufferSequence, Handler> op;
-    typename op::ptr p = { asio::detail::addressof(handler),
-      op::ptr::allocate(handler), 0 };
+    typename op::ptr p = { asio::detail::addressof(handler), op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl.socket_, impl.state_, buffers, flags, handler);
 
-    ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "socket",
-          &impl, impl.socket_, "async_receive"));
+    ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "socket", &impl, impl.socket_, "async_receive"));
 
     start_op(impl,
-        (flags & socket_base::message_out_of_band)
-          ? reactor::except_op : reactor::read_op,
-        p.p, is_continuation,
-        (flags & socket_base::message_out_of_band) == 0,
-        ((impl.state_ & socket_ops::stream_oriented)
-          && buffer_sequence_adapter<asio::mutable_buffer,
-            MutableBufferSequence>::all_empty(buffers)));
+            (flags & socket_base::message_out_of_band) ? reactor::except_op : reactor::read_op,
+            p.p, 
+            is_continuation,
+            (flags & socket_base::message_out_of_band) == 0,
+            ((impl.state_ & socket_ops::stream_oriented) && buffer_sequence_adapter<asio::mutable_buffer, MutableBufferSequence>::all_empty(buffers)));
+
     p.v = p.p = 0;
   }
 

@@ -895,6 +895,8 @@ public:
   async_read_some(const MutableBufferSequence& buffers,
       ASIO_MOVE_ARG(ReadHandler) handler)
   {
+    std::cout << "socket basic_stream_socket.hpp:895: " << std::endl;
+
     // If you get an error on the following line it means that your handler does
     // not meet the documented type requirements for a ReadHandler.
     ASIO_READ_HANDLER_CHECK(ReadHandler, handler) type_check;
@@ -903,11 +905,9 @@ public:
     return this->get_service().async_receive(this->get_implementation(),
         buffers, 0, ASIO_MOVE_CAST(ReadHandler)(handler));
 #else // defined(ASIO_ENABLE_OLD_SERVICES)
-    async_completion<ReadHandler,
-      void (asio::error_code, std::size_t)> init(handler);
+    async_completion<ReadHandler, void (asio::error_code, std::size_t)> init(handler);
 
-    this->get_service().async_receive(this->get_implementation(),
-        buffers, 0, init.completion_handler);
+    this->get_service().async_receive(this->get_implementation(), buffers, 0, init.completion_handler);
 
     return init.result.get();
 #endif // defined(ASIO_ENABLE_OLD_SERVICES)

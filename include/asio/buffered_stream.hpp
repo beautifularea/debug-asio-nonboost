@@ -223,11 +223,10 @@ public:
   /// Start an asynchronous read. The buffer into which the data will be read
   /// must be valid for the lifetime of the asynchronous operation.
   template <typename MutableBufferSequence, typename ReadHandler>
-  ASIO_INITFN_RESULT_TYPE(ReadHandler,
-      void (asio::error_code, std::size_t))
-  async_read_some(const MutableBufferSequence& buffers,
-      ASIO_MOVE_ARG(ReadHandler) handler)
+  ASIO_INITFN_RESULT_TYPE(ReadHandler, void (asio::error_code, std::size_t))
+  async_read_some(const MutableBufferSequence& buffers, ASIO_MOVE_ARG(ReadHandler) handler)
   {
+    std::cout << "是这个async_read_some?" << std::endl;
     return stream_impl_.async_read_some(buffers,
         ASIO_MOVE_CAST(ReadHandler)(handler));
   }

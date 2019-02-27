@@ -370,32 +370,32 @@ template <typename Stream>
 template <typename MutableBufferSequence, typename ReadHandler>
 ASIO_INITFN_RESULT_TYPE(ReadHandler,
     void (asio::error_code, std::size_t))
-buffered_read_stream<Stream>::async_read_some(
-    const MutableBufferSequence& buffers,
-    ASIO_MOVE_ARG(ReadHandler) handler)
+buffered_read_stream<Stream>::async_read_some(const MutableBufferSequence& buffers,
+                                              ASIO_MOVE_ARG(ReadHandler) handler)
 {
+    std::cout << "buffered_read_stream<Stream>::async_read_some" << std::endl;
+
   // If you get an error on the following line it means that your handler does
   // not meet the documented type requirements for a ReadHandler.
   ASIO_READ_HANDLER_CHECK(ReadHandler, handler) type_check;
 
-  async_completion<ReadHandler,
-    void (asio::error_code, std::size_t)> init(handler);
+  async_completion<ReadHandler, void (asio::error_code, std::size_t)> init(handler);
 
   using asio::buffer_size;
   if (buffer_size(buffers) == 0 || !storage_.empty())
   {
+    std::cout << "next_layer. async_read_some" << std::endl;
+
     next_layer_.async_read_some(ASIO_MUTABLE_BUFFER(0, 0),
-        detail::buffered_read_some_handler<
-          MutableBufferSequence, ASIO_HANDLER_TYPE(
-            ReadHandler, void (asio::error_code, std::size_t))>(
-            storage_, buffers, init.completion_handler));
+                                detail::buffered_read_some_handler<MutableBufferSequence, 
+                                                                   ASIO_HANDLER_TYPE(ReadHandler, void (asio::error_code, std::size_t))>
+                                                                   (storage_, buffers, init.completion_handler));
   }
   else
   {
-    this->async_fill(detail::buffered_read_some_handler<
-          MutableBufferSequence, ASIO_HANDLER_TYPE(
-            ReadHandler, void (asio::error_code, std::size_t))>(
-            storage_, buffers, init.completion_handler));
+    std::cout << "this->async_fill" << std::endl;
+    this->async_fill(detail::buffered_read_some_handler<MutableBufferSequence, ASIO_HANDLER_TYPE(ReadHandler, void (asio::error_code, std::size_t))>
+            (storage_, buffers, init.completion_handler));
   }
 
   return init.result.get();

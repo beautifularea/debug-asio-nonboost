@@ -109,84 +109,92 @@ void service_registry::destroy(execution_context::service* service)
   delete service;
 }
 
-execution_context::service* service_registry::do_use_service(
-    const execution_context::service::key& key,
-    factory_type factory, void* owner)
+execution_context::service* service_registry::do_use_service(const execution_context::service::key& key,
+                                                             factory_type factory, 
+                                                             void* owner)
 {
-  asio::detail::mutex::scoped_lock lock(mutex_);
+    std::cout << "进入到do_use_service" << std::endl;
+    //局部锁
+    asio::detail::mutex::scoped_lock lock(mutex_);
 
-  // First see if there is an existing service object with the given key.
-  execution_context::service* service = first_service_;
-  while (service)
-  {
-    if (keys_match(service->key_, key))
-      return service;
-    service = service->next_;
-  }
+    // First see if there is an existing service object with the given key.
+    execution_context::service* service = first_service_;
+    while (service)
+    {
+        if (keys_match(service->key_, key))
+            return service;
+        service = service->next_;
+    }
 
-  // Create a new service object. The service registry's mutex is not locked
-  // at this time to allow for nested calls into this function from the new
-  // service's constructor.
-  lock.unlock();
-  auto_service_ptr new_service = { factory(owner) };
-  new_service.ptr_->key_ = key;
-  lock.lock();
+    // Create a new service object. The service registry's mutex is not locked
+    // at this time to allow for nested calls into this function from the new
+    // service's constructor.
+    lock.unlock(); //读取后，解锁。
 
-  // Check that nobody else created another service object of the same type
-  // while the lock was released.
-  service = first_service_;
-  while (service)
-  {
-    if (keys_match(service->key_, key))
-      return service;
-    service = service->next_;
-  }
+    auto_service_ptr new_service = { factory(owner) };
+    new_service.ptr_->key_ = key;
 
-  // Service was successfully initialised, pass ownership to registry.
-  new_service.ptr_->next_ = first_service_;
-  first_service_ = new_service.ptr_;
-  new_service.ptr_ = 0;
-  return first_service_;
+    lock.lock();
+
+    // Check that nobody else created another service object of the same type
+    // while the lock was released.
+    //趁着先前解锁空挡，看看是否有人创建了。。。费劲。
+    service = first_service_;
+    while (service)
+    {
+        if (keys_match(service->key_, key))
+            return service;
+        service = service->next_;
+    }
+
+    // Service was successfully initialised, pass ownership to registry.
+    new_service.ptr_->next_ = first_service_;
+    first_service_ = new_service.ptr_;
+    new_service.ptr_ = 0;
+
+    return first_service_;
 }
 
-void service_registry::do_add_service(
-    const execution_context::service::key& key,
-    execution_context::service* new_service)
+void service_registry::do_add_service(const execution_context::service::key& key, execution_context::service* new_service)
 {
-  if (&owner_ != &new_service->context())
-    asio::detail::throw_exception(invalid_service_owner());
+    std::cout << "进入到 do_add_service 方法。" << std::endl;
 
-  asio::detail::mutex::scoped_lock lock(mutex_);
+    if (&owner_ != &new_service->context())
+        asio::detail::throw_exception(invalid_service_owner());
 
-  // Check if there is an existing service object with the given key.
-  execution_context::service* service = first_service_;
-  while (service)
-  {
-    if (keys_match(service->key_, key))
-      asio::detail::throw_exception(service_already_exists());
-    service = service->next_;
-  }
+    //加局部锁。
+    asio::detail::mutex::scoped_lock lock(mutex_);
 
-  // Take ownership of the service object.
-  new_service->key_ = key;
-  new_service->next_ = first_service_;
-  first_service_ = new_service;
+    // Check if there is an existing service object with the given key.
+    execution_context::service* service = first_service_;
+    while (service)
+    {
+        if (keys_match(service->key_, key))
+            asio::detail::throw_exception(service_already_exists());
+
+        service = service->next_;
+    }
+
+    // Take ownership of the service object.
+    new_service->key_ = key;
+    new_service->next_ = first_service_;
+    first_service_ = new_service;
 }
 
 bool service_registry::do_has_service(
-    const execution_context::service::key& key) const
+        const execution_context::service::key& key) const
 {
-  asio::detail::mutex::scoped_lock lock(mutex_);
+    asio::detail::mutex::scoped_lock lock(mutex_);
 
-  execution_context::service* service = first_service_;
-  while (service)
-  {
-    if (keys_match(service->key_, key))
-      return true;
-    service = service->next_;
-  }
+    execution_context::service* service = first_service_;
+    while (service)
+    {
+        if (keys_match(service->key_, key))
+            return true;
+        service = service->next_;
+    }
 
-  return false;
+    return false;
 }
 
 } // namespace detail

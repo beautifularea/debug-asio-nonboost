@@ -116,6 +116,7 @@ public:
   // Post a reactor operation for immediate completion.
   void post_immediate_completion(reactor_op* op, bool is_continuation)
   {
+    std::cout << "在epoll中调用 scheduler的post_immediate_completion" << std::endl;
     scheduler_.post_immediate_completion(op, is_continuation);
   }
 
