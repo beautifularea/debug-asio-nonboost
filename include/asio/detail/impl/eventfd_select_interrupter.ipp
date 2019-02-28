@@ -117,6 +117,9 @@ void eventfd_select_interrupter::recreate()
 
 void eventfd_select_interrupter::interrupt()
 {
+    std::cout << "中断方法，先预写8个字节的数据到中断描述符中。" << std::endl;
+    //8个字节的数据。
+    //添加到epoll_wait中采用EPOLLET触发，这样，只要select_interrupter的读文件描述符添加到epoll_wait中，立即中断epoll_wait。很是巧妙.
   uint64_t counter(1UL);
   int result = ::write(write_descriptor_, &counter, sizeof(uint64_t));
   (void)result;

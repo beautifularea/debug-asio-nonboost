@@ -244,19 +244,19 @@ namespace detail {
                                                 bool noop)
     {
          
-        std::cout << "---------------------start_op-----------------------------------" << std::endl;
+        std::cout << "start_op参数：" << std::endl;
         std::cout << "op_type         : " << op_type << std::endl;
         std::cout << "is_continuation : " << is_continuation << std::endl;
         std::cout << "is_non_blocking : " << is_non_blocking << std::endl;
         std::cout << "noop            : " << noop << std::endl;
+        std::cout << "\n" ;
+
         if (!noop)
         {
-            if ((impl.state_ & socket_ops::non_blocking)
-                    || socket_ops::set_internal_non_blocking(
-                        impl.socket_, impl.state_, true, op->ec_))
+            //调用reactor的start_op
+            if ((impl.state_ & socket_ops::non_blocking) || socket_ops::set_internal_non_blocking(impl.socket_, impl.state_, true, op->ec_))
             {
-                reactor_.start_op(op_type, impl.socket_,
-                        impl.reactor_data_, op, is_continuation, is_non_blocking);
+                reactor_.start_op(op_type, impl.socket_, impl.reactor_data_, op, is_continuation, is_non_blocking);
                 return;
             }
         }
@@ -264,12 +264,18 @@ namespace detail {
         reactor_.post_immediate_completion(op, is_continuation);
     }
 
-    void reactive_socket_service_base::start_accept_op(
-            reactive_socket_service_base::base_implementation_type& impl,
-            reactor_op* op, bool is_continuation, bool peer_is_open)
+    void reactive_socket_service_base::start_accept_op(reactive_socket_service_base::base_implementation_type& impl,
+                                                       reactor_op* op, 
+                                                       bool is_continuation, 
+                                                       bool peer_is_open)
     {
+        std::cout << "进入到start_accept_op方法。" << std::endl;
+
         if (!peer_is_open)
+        {
+            std::cout << "调用start_op" << std::endl;
             start_op(impl, reactor::read_op, op, is_continuation, true, false);
+        }
         else
         {
             op->ec_ = asio::error::already_open;

@@ -323,6 +323,7 @@ public:
       ASIO_MOVE_ARG(AcceptHandler) handler,
       typename enable_if<is_convertible<Protocol, Protocol1>::value>::type* = 0)
   {
+    std::cout << "这里是async_accept入口  1 ？" << std::endl;
     async_completion<AcceptHandler,
       void (asio::error_code)> init(handler);
 
@@ -341,12 +342,11 @@ public:
       asio::io_context* peer_io_context, endpoint_type* peer_endpoint,
       ASIO_MOVE_ARG(MoveAcceptHandler) handler)
   {
-    async_completion<MoveAcceptHandler,
-      void (asio::error_code,
-        typename Protocol::socket)> init(handler);
+    std::cout << "这里是async_accept入口 ？" << std::endl;
 
-    service_impl_.async_accept(impl,
-        peer_io_context, peer_endpoint, init.completion_handler);
+    async_completion<MoveAcceptHandler, void (asio::error_code, typename Protocol::socket)> init(handler);
+
+    service_impl_.async_accept(impl, peer_io_context, peer_endpoint, init.completion_handler);
 
     return init.result.get();
   }

@@ -37,7 +37,7 @@
 #endif
 
 #include "asio/detail/push_options.hpp"
-
+#include <iostream>
 namespace asio {
 
 namespace detail {
@@ -45,6 +45,7 @@ namespace detail {
   typedef class win_iocp_io_context io_context_impl;
   class win_iocp_overlapped_ptr;
 #else
+    //std::cout << "设置scheduler的别名为 : io_context_impl" << std::endl;
   typedef class scheduler io_context_impl;
 #endif
 } // namespace detail

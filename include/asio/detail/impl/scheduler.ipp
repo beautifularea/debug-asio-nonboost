@@ -85,16 +85,10 @@ struct scheduler::work_cleanup
   thread_info* this_thread_;
 };
 
-scheduler::scheduler(
-    asio::execution_context& ctx, int concurrency_hint)
+scheduler::scheduler(asio::execution_context& ctx, int concurrency_hint)
   : asio::detail::execution_context_service_base<scheduler>(ctx),
-    one_thread_(concurrency_hint == 1
-        || !ASIO_CONCURRENCY_HINT_IS_LOCKING(
-          SCHEDULER, concurrency_hint)
-        || !ASIO_CONCURRENCY_HINT_IS_LOCKING(
-          REACTOR_IO, concurrency_hint)),
-    mutex_(ASIO_CONCURRENCY_HINT_IS_LOCKING(
-          SCHEDULER, concurrency_hint)),
+    one_thread_(concurrency_hint == 1 || !ASIO_CONCURRENCY_HINT_IS_LOCKING(SCHEDULER, concurrency_hint) || !ASIO_CONCURRENCY_HINT_IS_LOCKING(REACTOR_IO, concurrency_hint)),
+    mutex_(ASIO_CONCURRENCY_HINT_IS_LOCKING(SCHEDULER, concurrency_hint)),
     task_(0),
     task_interrupted_(true),
     outstanding_work_(0),
@@ -102,6 +96,10 @@ scheduler::scheduler(
     shutdown_(false),
     concurrency_hint_(concurrency_hint)
 {
+    std::cout << "进入到scheduler的构造函数。" << std::endl;
+    std::cout << "concurrency_hit : " << concurrency_hint_ << std::endl;
+
+
   ASIO_HANDLER_TRACKING_INIT;
 }
 
@@ -379,9 +377,10 @@ void scheduler::abandon_operations(
 
 std::size_t scheduler::do_run_one(mutex::scoped_lock& lock, scheduler::thread_info& this_thread, const asio::error_code& ec)
 {
-    std::cout << "进入到 scheduler的　do_run_one　方法。" << std::endl;
+    std::cout << "\n--------------------------------------进入到 scheduler的　do_run_one　方法。-----------------------------------------" << std::endl;
     while (!stopped_)
     {
+        std::cout << "\n...进入事件循环..." << std::endl;
         if (!op_queue_.empty())
         {
             std::cout << "op_queue_ 队列不为空。" << std::endl;
@@ -391,7 +390,7 @@ std::size_t scheduler::do_run_one(mutex::scoped_lock& lock, scheduler::thread_in
             op_queue_.pop();
             bool more_handlers = (!op_queue_.empty());
 
-            std::cout << "还有　" << more_handlers << "　任务。" << std::endl;
+            //std::cout << "还有　" << more_handlers << "　任务。" << std::endl;
 
             if (o == &task_operation_)
             {
@@ -440,6 +439,8 @@ std::size_t scheduler::do_run_one(mutex::scoped_lock& lock, scheduler::thread_in
             wakeup_event_.wait(lock);
         }
     }
+
+    std::cout << "执行完毕 scheduler的　do_run_one　方法。\n" << std::endl;
 
     return 0;
 }

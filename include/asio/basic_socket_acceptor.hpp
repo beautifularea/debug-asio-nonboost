@@ -121,6 +121,8 @@ public:
       const protocol_type& protocol)
     : basic_io_object<ASIO_SVC_T>(io_context)
   {
+    std::cout << "basic_socket_acceptor 构造函数。" << std::endl;
+
     asio::error_code ec;
     this->get_service().open(this->get_implementation(), protocol, ec);
     asio::detail::throw_error(ec, "open");
@@ -1256,20 +1258,21 @@ public:
       typename enable_if<is_convertible<Protocol, Protocol1>::value>::type* = 0)
 #endif // defined(ASIO_ENABLE_OLD_SERVICES)
   {
+    std::cout << "最开始aysnc_accept方法 1 ？" << std::endl;
     // If you get an error on the following line it means that your handler does
     // not meet the documented type requirements for a AcceptHandler.
     ASIO_ACCEPT_HANDLER_CHECK(AcceptHandler, handler) type_check;
 
 #if defined(ASIO_ENABLE_OLD_SERVICES)
+xxx
     return this->get_service().async_accept(this->get_implementation(),
         peer, static_cast<endpoint_type*>(0),
         ASIO_MOVE_CAST(AcceptHandler)(handler));
 #else // defined(ASIO_ENABLE_OLD_SERVICES)
-    async_completion<AcceptHandler,
-      void (asio::error_code)> init(handler);
+   
+   async_completion<AcceptHandler, void (asio::error_code)> init(handler);
 
-    this->get_service().async_accept(this->get_implementation(),
-        peer, static_cast<endpoint_type*>(0), init.completion_handler);
+    this->get_service().async_accept(this->get_implementation(), peer, static_cast<endpoint_type*>(0), init.completion_handler);
 
     return init.result.get();
 #endif // defined(ASIO_ENABLE_OLD_SERVICES)
@@ -1395,6 +1398,7 @@ public:
       endpoint_type& peer_endpoint, ASIO_MOVE_ARG(AcceptHandler) handler)
 #endif // defined(ASIO_ENABLE_OLD_SERVICES)
   {
+    std::cout << "最开始的async_accept 方法 2 " << std::endl;
     // If you get an error on the following line it means that your handler does
     // not meet the documented type requirements for a AcceptHandler.
     ASIO_ACCEPT_HANDLER_CHECK(AcceptHandler, handler) type_check;
@@ -1403,11 +1407,10 @@ public:
     return this->get_service().async_accept(this->get_implementation(), peer,
         &peer_endpoint, ASIO_MOVE_CAST(AcceptHandler)(handler));
 #else // defined(ASIO_ENABLE_OLD_SERVICES)
-    async_completion<AcceptHandler,
-      void (asio::error_code)> init(handler);
+    
+    async_completion<AcceptHandler, void (asio::error_code)> init(handler);
 
-    this->get_service().async_accept(this->get_implementation(),
-        peer, &peer_endpoint, init.completion_handler);
+    this->get_service().async_accept(this->get_implementation(), peer, &peer_endpoint, init.completion_handler);
 
     return init.result.get();
 #endif // defined(ASIO_ENABLE_OLD_SERVICES)
@@ -1514,14 +1517,14 @@ public:
    * @endcode
    */
   template <typename MoveAcceptHandler>
-  ASIO_INITFN_RESULT_TYPE(MoveAcceptHandler,
-      void (asio::error_code, typename Protocol::socket))
+  ASIO_INITFN_RESULT_TYPE(MoveAcceptHandler, void (asio::error_code, typename Protocol::socket))
   async_accept(ASIO_MOVE_ARG(MoveAcceptHandler) handler)
   {
+    std::cout << "最开始的async_accept 方法 3" << std::endl;
+
     // If you get an error on the following line it means that your handler does
     // not meet the documented type requirements for a MoveAcceptHandler.
-    ASIO_MOVE_ACCEPT_HANDLER_CHECK(MoveAcceptHandler,
-        handler, typename Protocol::socket) type_check;
+    ASIO_MOVE_ACCEPT_HANDLER_CHECK(MoveAcceptHandler, handler, typename Protocol::socket) type_check;
 
 #if defined(ASIO_ENABLE_OLD_SERVICES)
     return this->get_service().async_accept(
@@ -1529,13 +1532,12 @@ public:
         static_cast<endpoint_type*>(0),
         ASIO_MOVE_CAST(MoveAcceptHandler)(handler));
 #else // defined(ASIO_ENABLE_OLD_SERVICES)
-    async_completion<MoveAcceptHandler,
-      void (asio::error_code,
-        typename Protocol::socket)> init(handler);
+    async_completion<MoveAcceptHandler, void (asio::error_code, typename Protocol::socket)> init(handler);
 
-    this->get_service().async_accept(
-        this->get_implementation(), static_cast<asio::io_context*>(0),
-        static_cast<endpoint_type*>(0), init.completion_handler);
+    this->get_service().async_accept(this->get_implementation(), 
+                                     static_cast<asio::io_context*>(0),
+                                     static_cast<endpoint_type*>(0), 
+                                     init.completion_handler);
 
     return init.result.get();
 #endif // defined(ASIO_ENABLE_OLD_SERVICES)
@@ -1656,6 +1658,7 @@ public:
   async_accept(asio::io_context& io_context,
       ASIO_MOVE_ARG(MoveAcceptHandler) handler)
   {
+    std::cout << "最开始async_accept 方法 4" << std::endl;
     // If you get an error on the following line it means that your handler does
     // not meet the documented type requirements for a MoveAcceptHandler.
     ASIO_MOVE_ACCEPT_HANDLER_CHECK(MoveAcceptHandler,
@@ -1666,12 +1669,9 @@ public:
         &io_context, static_cast<endpoint_type*>(0),
         ASIO_MOVE_CAST(MoveAcceptHandler)(handler));
 #else // defined(ASIO_ENABLE_OLD_SERVICES)
-    async_completion<MoveAcceptHandler,
-      void (asio::error_code,
-        typename Protocol::socket)> init(handler);
+    async_completion<MoveAcceptHandler, void (asio::error_code, typename Protocol::socket)> init(handler);
 
-    this->get_service().async_accept(this->get_implementation(),
-        &io_context, static_cast<endpoint_type*>(0), init.completion_handler);
+    this->get_service().async_accept(this->get_implementation(), &io_context, static_cast<endpoint_type*>(0), init.completion_handler);
 
     return init.result.get();
 #endif // defined(ASIO_ENABLE_OLD_SERVICES)
@@ -1797,6 +1797,7 @@ public:
   async_accept(endpoint_type& peer_endpoint,
       ASIO_MOVE_ARG(MoveAcceptHandler) handler)
   {
+    std::cout << "最开始async_accept 方法 5" << std::endl;
     // If you get an error on the following line it means that your handler does
     // not meet the documented type requirements for a MoveAcceptHandler.
     ASIO_MOVE_ACCEPT_HANDLER_CHECK(MoveAcceptHandler,
@@ -1807,13 +1808,12 @@ public:
         static_cast<asio::io_context*>(0), &peer_endpoint,
         ASIO_MOVE_CAST(MoveAcceptHandler)(handler));
 #else // defined(ASIO_ENABLE_OLD_SERVICES)
-    async_completion<MoveAcceptHandler,
-      void (asio::error_code,
-        typename Protocol::socket)> init(handler);
+    async_completion<MoveAcceptHandler, void (asio::error_code, typename Protocol::socket)> init(handler);
 
     this->get_service().async_accept(this->get_implementation(),
-        static_cast<asio::io_context*>(0), &peer_endpoint,
-        init.completion_handler);
+                                     static_cast<asio::io_context*>(0), 
+                                     &peer_endpoint,
+                                     init.completion_handler);
 
     return init.result.get();
 #endif // defined(ASIO_ENABLE_OLD_SERVICES)
@@ -1952,6 +1952,8 @@ public:
       endpoint_type& peer_endpoint,
       ASIO_MOVE_ARG(MoveAcceptHandler) handler)
   {
+    std::cout << "最开始async_accept 方法 6" << std::endl;
+
     // If you get an error on the following line it means that your handler does
     // not meet the documented type requirements for a MoveAcceptHandler.
     ASIO_MOVE_ACCEPT_HANDLER_CHECK(MoveAcceptHandler,
@@ -1962,12 +1964,12 @@ public:
         this->get_implementation(), &io_context, &peer_endpoint,
         ASIO_MOVE_CAST(MoveAcceptHandler)(handler));
 #else // defined(ASIO_ENABLE_OLD_SERVICES)
-    async_completion<MoveAcceptHandler,
-      void (asio::error_code,
-        typename Protocol::socket)> init(handler);
+    async_completion<MoveAcceptHandler, void (asio::error_code, typename Protocol::socket)> init(handler);
 
     this->get_service().async_accept(this->get_implementation(),
-        &io_context, &peer_endpoint, init.completion_handler);
+                                     &io_context, 
+                                     &peer_endpoint, 
+                                     init.completion_handler);
 
     return init.result.get();
 #endif // defined(ASIO_ENABLE_OLD_SERVICES)

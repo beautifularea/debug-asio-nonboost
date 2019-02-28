@@ -441,6 +441,8 @@ public:
   void async_accept(implementation_type& impl, Socket& peer,
       endpoint_type* peer_endpoint, Handler& handler)
   {
+    std::cout << "进入到async_accept 方法 1 " << std::endl;
+
     bool is_continuation =
       asio_handler_cont_helpers::is_continuation(handler);
 
@@ -463,23 +465,25 @@ public:
   // the accept's handler is invoked.
   template <typename Handler>
   void async_accept(implementation_type& impl,
-      asio::io_context* peer_io_context,
-      endpoint_type* peer_endpoint, Handler& handler)
+                    asio::io_context* peer_io_context,
+                    endpoint_type* peer_endpoint, 
+                    Handler& handler)
   {
-    bool is_continuation =
-      asio_handler_cont_helpers::is_continuation(handler);
+    std::cout << "进入到async_accept 方法 2 " << std::endl;
+
+    bool is_continuation = asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
+    //创建reactive_socket_move_accept_op
+    std::cout << "在这个方法中开始创建reactive_socket_move_accept_op, 为接收做准备。" << std::endl;
     typedef reactive_socket_move_accept_op<Protocol, Handler> op;
-    typename op::ptr p = { asio::detail::addressof(handler),
-      op::ptr::allocate(handler), 0 };
-    p.p = new (p.v) op(peer_io_context ? *peer_io_context : io_context_,
-        impl.socket_, impl.state_, impl.protocol_, peer_endpoint, handler);
+    typename op::ptr p = { asio::detail::addressof(handler), op::ptr::allocate(handler), 0 };
+    p.p = new (p.v) op(peer_io_context ? *peer_io_context : io_context_, impl.socket_, impl.state_, impl.protocol_, peer_endpoint, handler);
 
-    ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "socket",
-          &impl, impl.socket_, "async_accept"));
+    ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "socket", &impl, impl.socket_, "async_accept"));
 
     start_accept_op(impl, p.p, is_continuation, false);
+
     p.v = p.p = 0;
   }
 #endif // defined(ASIO_HAS_MOVE)

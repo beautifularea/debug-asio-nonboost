@@ -25,6 +25,7 @@
 namespace asio {
 namespace detail {
 
+//中断类型
 class eventfd_select_interrupter
 {
 public:

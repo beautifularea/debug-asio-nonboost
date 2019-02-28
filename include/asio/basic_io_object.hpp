@@ -170,6 +170,7 @@ protected:
   /// Get the underlying implementation of the I/O object.
   implementation_type& get_implementation()
   {
+    std::cout << "得到当前的implementation 2" << std::endl;
     return implementation_;
   }
 
@@ -266,6 +267,7 @@ protected:
 
   implementation_type& get_implementation()
   {
+    std::cout << "获取当前的 implementation." << std::endl;
     return implementation_;
   }
 

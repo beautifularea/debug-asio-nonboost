@@ -33,8 +33,10 @@ namespace detail {
 #if defined(ASIO_WINDOWS) || defined(__CYGWIN__) || defined(__SYMBIAN32__)
 typedef socket_select_interrupter select_interrupter;
 #elif defined(ASIO_HAS_EVENTFD)
+//linux平台中断的别名。
 typedef eventfd_select_interrupter select_interrupter;
 #else
+xxx
 typedef pipe_select_interrupter select_interrupter;
 #endif
 

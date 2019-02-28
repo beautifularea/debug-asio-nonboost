@@ -92,6 +92,7 @@ public:
   explicit basic_socket(asio::io_context& io_context)
     : basic_io_object<ASIO_SVC_T>(io_context)
   {
+    std::cout << "basic_socket 构造函数。" << std::endl;
   }
 
   /// Construct and open a basic_socket.

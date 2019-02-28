@@ -453,7 +453,7 @@ async_read(AsyncReadStream& s, const MutableBufferSequence& buffers,
       is_mutable_buffer_sequence<MutableBufferSequence>::value
     >::type*)
 {
-    std::cout << "async_read 6" << std::endl;
+    std::cout << "\n-----------------async_read 6" << std::endl;
 
   // If you get an error on the following line it means that your handler does
   // not meet the documented type requirements for a ReadHandler.
@@ -463,6 +463,7 @@ async_read(AsyncReadStream& s, const MutableBufferSequence& buffers,
 
   detail::start_read_buffer_sequence_op(s, buffers, asio::buffer_sequence_begin(buffers), transfer_all(), init.completion_handler);
 
+    std::cout << "async_read 6 返回-----------------\n" << std::endl;
   return init.result.get();
 }
 

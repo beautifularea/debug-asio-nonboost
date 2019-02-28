@@ -48,6 +48,7 @@ public:
   // The native type of a socket.
   typedef socket_type native_handle_type;
 
+    //属性包括：socket_/state_/reactor_data_
   // The implementation type of the socket.
   struct base_implementation_type
   {

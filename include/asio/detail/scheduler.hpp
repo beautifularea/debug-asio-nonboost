@@ -80,8 +80,9 @@ public:
   // Notify that some work has started.
   void work_started()
   {
-    std::cout << "在work_started方法中，就是更新了一下outstanding_work.+1." << std::endl;
     ++outstanding_work_;
+
+    std::cout << "在work_started方法中，就是更新了一下outstanding_work.+1 : " << outstanding_work_ << std::endl;
   }
 
   // Used to compensate for a forthcoming work_finished call. Must be called

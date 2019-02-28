@@ -44,18 +44,20 @@ public:
       peer_endpoint_(peer_endpoint),
       addrlen_(peer_endpoint ? peer_endpoint->capacity() : 0)
   {
+    std::cout << "进入到reactive_socket_accept_op_base构造函数。" << std::endl;
+    std::cout << "socket_ : " << socket_ << std::endl;
   }
 
   static status do_perform(reactor_op* base)
   {
-    reactive_socket_accept_op_base* o(
-        static_cast<reactive_socket_accept_op_base*>(base));
+    std::cout << "进入到reactive_socket_accept_op_base的do_perform函数。" << std::endl;
+
+    reactive_socket_accept_op_base* o(static_cast<reactive_socket_accept_op_base*>(base));
 
     socket_type new_socket = invalid_socket;
-    status result = socket_ops::non_blocking_accept(o->socket_,
-        o->state_, o->peer_endpoint_ ? o->peer_endpoint_->data() : 0,
-        o->peer_endpoint_ ? &o->addrlen_ : 0, o->ec_, new_socket)
-    ? done : not_done;
+    status result = socket_ops::non_blocking_accept(o->socket_, o->state_, o->peer_endpoint_ ? o->peer_endpoint_->data() : 0,
+                                                    o->peer_endpoint_ ? &o->addrlen_ : 0, 
+                                                    o->ec_, new_socket)  ? done : not_done;
     o->new_socket_.reset(new_socket);
 
     ASIO_HANDLER_REACTOR_OPERATION((*o, "non_blocking_accept", o->ec_));
@@ -152,16 +154,23 @@ class reactive_socket_move_accept_op :
 public:
   ASIO_DEFINE_HANDLER_PTR(reactive_socket_move_accept_op);
 
-  reactive_socket_move_accept_op(io_context& ioc, socket_type socket,
-      socket_ops::state_type state, const Protocol& protocol,
-      typename Protocol::endpoint* peer_endpoint, Handler& handler)
+  reactive_socket_move_accept_op(io_context& ioc, 
+                                 socket_type socket,
+                                 socket_ops::state_type state, 
+                                 const Protocol& protocol,
+                                 typename Protocol::endpoint* peer_endpoint, 
+                                 Handler& handler)
     : Protocol::socket(ioc),
-      reactive_socket_accept_op_base<typename Protocol::socket, Protocol>(
-        socket, state, *this, protocol, peer_endpoint,
-        &reactive_socket_move_accept_op::do_complete),
-      handler_(ASIO_MOVE_CAST(Handler)(handler))
+      reactive_socket_accept_op_base<typename Protocol::socket, Protocol>(socket, 
+                                                                          state, 
+                                                                          *this, 
+                                                                          protocol, 
+                                                                          peer_endpoint,
+                                                                          &reactive_socket_move_accept_op::do_complete),
+                                                                          handler_(ASIO_MOVE_CAST(Handler)(handler))
   {
-    handler_work<Handler>::start(handler_);
+    std::cout << "进入到reactive_socket_move_accept_op构造函数。" << std::endl;
+        handler_work<Handler>::start(handler_);
   }
 
   static void do_complete(void* owner, operation* base,
