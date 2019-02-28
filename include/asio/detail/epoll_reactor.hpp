@@ -58,14 +58,19 @@ public:
     friend class epoll_reactor;
     friend class object_pool_access;
 
+    //双链表结构.
     descriptor_state* next_;
     descriptor_state* prev_;
 
     mutex mutex_;
+
     epoll_reactor* reactor_;
+
     int descriptor_;
     uint32_t registered_events_;
+
     op_queue<reactor_op> op_queue_[max_ops];
+
     bool try_speculative_[max_ops];
     bool shutdown_;
 

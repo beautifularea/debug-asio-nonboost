@@ -65,6 +65,7 @@ namespace asio {
 template <typename Function>
 inline void asio_handler_invoke(Function& function, ...)
 {
+    std::cout << "进入到asio_handler_invoke方法。" << std::endl;
   function();
 }
 
@@ -72,6 +73,7 @@ inline void asio_handler_invoke(Function& function, ...)
 template <typename Function>
 inline void asio_handler_invoke(const Function& function, ...)
 {
+    std::cout << "进入到const asio_handler_invoke方法。" << std::endl;
   Function tmp(function);
   tmp();
 }

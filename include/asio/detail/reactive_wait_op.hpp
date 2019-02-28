@@ -37,12 +37,15 @@ public:
     : reactor_op(&reactive_wait_op::do_perform,
         &reactive_wait_op::do_complete),
       handler_(ASIO_MOVE_CAST(Handler)(handler))
-  {
+  { 
+    std::cout << "reactive_wait_op 构造函数。" << std::endl;
+
     handler_work<Handler>::start(handler_);
   }
 
   static status do_perform(reactor_op*)
   {
+    std::cout << "reactive_wait_op的do_perform方法。" << std::endl;
     return done;
   }
 

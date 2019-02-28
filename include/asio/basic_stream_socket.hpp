@@ -890,18 +890,17 @@ public:
    * std::vector.
    */
   template <typename MutableBufferSequence, typename ReadHandler>
-  ASIO_INITFN_RESULT_TYPE(ReadHandler,
-      void (asio::error_code, std::size_t))
-  async_read_some(const MutableBufferSequence& buffers,
-      ASIO_MOVE_ARG(ReadHandler) handler)
+  ASIO_INITFN_RESULT_TYPE(ReadHandler, void (asio::error_code, std::size_t))  
+  async_read_some(const MutableBufferSequence& buffers, ASIO_MOVE_ARG(ReadHandler) handler)
   {
-    std::cout << "socket basic_stream_socket.hpp:895: " << std::endl;
+    std::cout << "进入到async_read_some方法。 " << std::endl;
 
     // If you get an error on the following line it means that your handler does
     // not meet the documented type requirements for a ReadHandler.
     ASIO_READ_HANDLER_CHECK(ReadHandler, handler) type_check;
 
 #if defined(ASIO_ENABLE_OLD_SERVICES)
+xx
     return this->get_service().async_receive(this->get_implementation(),
         buffers, 0, ASIO_MOVE_CAST(ReadHandler)(handler));
 #else // defined(ASIO_ENABLE_OLD_SERVICES)

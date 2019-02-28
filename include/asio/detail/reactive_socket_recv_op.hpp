@@ -41,28 +41,31 @@ public:
       buffers_(buffers),
       flags_(flags)
   {
+    std::cout << "reactive_socket_recv_op_base构造函数。" << std::endl;
   }
 
   static status do_perform(reactor_op* base)
   {
-    reactive_socket_recv_op_base* o(
-        static_cast<reactive_socket_recv_op_base*>(base));
+    std::cout << "reactive_socket_recv_op_base类中的do_perform方法。" << std::endl;
 
-    buffer_sequence_adapter<asio::mutable_buffer,
-        MutableBufferSequence> bufs(o->buffers_);
+    reactive_socket_recv_op_base* o(static_cast<reactive_socket_recv_op_base*>(base));
+
+    buffer_sequence_adapter<asio::mutable_buffer, MutableBufferSequence> bufs(o->buffers_);
 
     status result = socket_ops::non_blocking_recv(o->socket_,
-        bufs.buffers(), bufs.count(), o->flags_,
-        (o->state_ & socket_ops::stream_oriented) != 0,
-        o->ec_, o->bytes_transferred_) ? done : not_done;
+                                                  bufs.buffers(), 
+                                                  bufs.count(), 
+                                                  o->flags_,
+                                                  (o->state_ & socket_ops::stream_oriented) != 0,
+                                                  o->ec_, 
+                                                  o->bytes_transferred_) ? done : not_done;
 
     if (result == done)
       if ((o->state_ & socket_ops::stream_oriented) != 0)
         if (o->bytes_transferred_ == 0)
           result = done_and_exhausted;
 
-    ASIO_HANDLER_REACTOR_OPERATION((*o, "non_blocking_recv",
-          o->ec_, o->bytes_transferred_));
+    ASIO_HANDLER_REACTOR_OPERATION((*o, "non_blocking_recv", o->ec_, o->bytes_transferred_));
 
     return result;
   }
@@ -95,9 +98,13 @@ public:
       const asio::error_code& /*ec*/,
       std::size_t /*bytes_transferred*/)
   {
+    std::cout << "reactive_socket_recv_op 的 do_complete方法。" << std::endl;
+
     // Take ownership of the handler object.
     reactive_socket_recv_op* o(static_cast<reactive_socket_recv_op*>(base));
+
     ptr p = { asio::detail::addressof(o->handler_), o, o };
+
     handler_work<Handler> w(o->handler_);
 
     ASIO_HANDLER_COMPLETION((*o));
@@ -108,8 +115,7 @@ public:
     // with the handler. Consequently, a local copy of the handler is required
     // to ensure that any owning sub-object remains valid until after we have
     // deallocated the memory here.
-    detail::binder2<Handler, asio::error_code, std::size_t>
-      handler(o->handler_, o->ec_, o->bytes_transferred_);
+    detail::binder2<Handler, asio::error_code, std::size_t> handler(o->handler_, o->ec_, o->bytes_transferred_);
     p.h = asio::detail::addressof(handler.handler_);
     p.reset();
 
@@ -117,8 +123,13 @@ public:
     if (owner)
     {
       fenced_block b(fenced_block::half);
+
+        std::cout << "\n---------------------------handler调用开始。。。" << std::endl;
       ASIO_HANDLER_INVOCATION_BEGIN((handler.arg1_, handler.arg2_));
+
       w.complete(handler, handler.handler_);
+
+        std::cout << "handler调用结束。。。----------------------------------\n" << std::endl;
       ASIO_HANDLER_INVOCATION_END;
     }
   }

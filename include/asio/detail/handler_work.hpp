@@ -51,8 +51,9 @@ public:
   template <typename Function>
   void complete(Function& function, Handler& handler)
   {
-    executor_.dispatch(ASIO_MOVE_CAST(Function)(function),
-        associated_allocator<Handler>::get(handler));
+    std::cout << "Handler_work 的compelte方法，调用 dispatch分配function." << std::endl;
+
+    executor_.dispatch(ASIO_MOVE_CAST(Function)(function), associated_allocator<Handler>::get(handler));
   }
 
 private:
@@ -78,6 +79,7 @@ public:
   template <typename Function>
   void complete(Function& function, Handler& handler)
   {
+    std::cout << "模板类handler_work的complete方法。" << std::endl;
     asio_handler_invoke_helpers::invoke(function, handler);
   }
 

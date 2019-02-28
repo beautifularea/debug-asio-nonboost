@@ -274,7 +274,7 @@ namespace detail
                 do
                 {
                     std::cout << "调用异步读取。。。async_read_some" << std::endl;
-                    stream_.async_read_some(buffers_.prepare(max_size), ASIO_MOVE_CAST(read_op)(*this));
+                    stream_.async_read_some(buffers_.prepare(max_size), ASIO_MOVE_CAST(read_op)(*this)); //第二次 read_op调用在这里！！！
                     return; 
                     
                     default:

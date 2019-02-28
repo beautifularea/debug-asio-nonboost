@@ -80,6 +80,7 @@ public:
   // Notify that some work has started.
   void work_started()
   {
+    std::cout << "在work_started方法中，就是更新了一下outstanding_work.+1." << std::endl;
     ++outstanding_work_;
   }
 

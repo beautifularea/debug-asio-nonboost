@@ -40,6 +40,7 @@ public:
   // Perform the operation. Returns true if it is finished.
   status perform()
   {
+    std::cout << "在perform方法中，调用注册过的函数。" << std::endl;
     return perform_func_(this);
   }
 
@@ -51,6 +52,7 @@ protected:
       bytes_transferred_(0),
       perform_func_(perform_func)
   {
+    std::cout << "reactor_op的构造函数，注册 perform_func函数。" << std::endl;
   }
 
 private:

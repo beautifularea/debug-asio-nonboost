@@ -42,27 +42,31 @@ public:
       sender_endpoint_(endpoint),
       flags_(flags)
   {
+    std::cout << "进入到reactive_socket_recvfrom_op_base构造函数。" << std::endl;
   }
 
   static status do_perform(reactor_op* base)
   {
-    reactive_socket_recvfrom_op_base* o(
-        static_cast<reactive_socket_recvfrom_op_base*>(base));
+    std::cout << "reactive_socket_recvfrom_op_base的static do_perform方法。" << std::endl;
 
-    buffer_sequence_adapter<asio::mutable_buffer,
-        MutableBufferSequence> bufs(o->buffers_);
+    reactive_socket_recvfrom_op_base* o(static_cast<reactive_socket_recvfrom_op_base*>(base));
+
+    buffer_sequence_adapter<asio::mutable_buffer, MutableBufferSequence> bufs(o->buffers_);
 
     std::size_t addr_len = o->sender_endpoint_.capacity();
     status result = socket_ops::non_blocking_recvfrom(o->socket_,
-        bufs.buffers(), bufs.count(), o->flags_,
-        o->sender_endpoint_.data(), &addr_len,
-        o->ec_, o->bytes_transferred_) ? done : not_done;
+                                                      bufs.buffers(), 
+                                                      bufs.count(), 
+                                                      o->flags_,
+                                                      o->sender_endpoint_.data(), 
+                                                      &addr_len,
+                                                      o->ec_, 
+                                                      o->bytes_transferred_) ? done : not_done;
 
     if (result && !o->ec_)
       o->sender_endpoint_.resize(addr_len);
 
-    ASIO_HANDLER_REACTOR_OPERATION((*o, "non_blocking_recvfrom",
-          o->ec_, o->bytes_transferred_));
+    ASIO_HANDLER_REACTOR_OPERATION((*o, "non_blocking_recvfrom", o->ec_, o->bytes_transferred_));
 
     return result;
   }
@@ -90,6 +94,8 @@ public:
         &reactive_socket_recvfrom_op::do_complete),
       handler_(ASIO_MOVE_CAST(Handler)(handler))
   {
+    std::cout << "进入到reactive_socket_recvfrom_op构造函数。" << std::endl;
+
     handler_work<Handler>::start(handler_);
   }
 
@@ -97,6 +103,7 @@ public:
       const asio::error_code& /*ec*/,
       std::size_t /*bytes_transferred*/)
   {
+    std::cout << "reactive_socket_recvfrom_op 的　do_complete方法。" << std::endl;
     // Take ownership of the handler object.
     reactive_socket_recvfrom_op* o(
         static_cast<reactive_socket_recvfrom_op*>(base));

@@ -29,10 +29,13 @@ namespace asio_handler_invoke_helpers {
 template <typename Function, typename Context>
 inline void invoke(Function& function, Context& context)
 {
+    std::cout << "asio_handler_invoke_helpers invoke 方法1" << std::endl;
 #if !defined(ASIO_HAS_HANDLER_HOOKS)
   Function tmp(function);
   tmp();
+  xxx
 #else
+    std::cout << "调用asio_handler_invoke方法。" << std::endl;
   using asio::asio_handler_invoke;
   asio_handler_invoke(function, asio::detail::addressof(context));
 #endif
@@ -41,10 +44,13 @@ inline void invoke(Function& function, Context& context)
 template <typename Function, typename Context>
 inline void invoke(const Function& function, Context& context)
 {
+    std::cout << "asio_handler_invoke_helpers invoke 方法2" << std::endl;
 #if !defined(ASIO_HAS_HANDLER_HOOKS)
   Function tmp(function);
   tmp();
+  xxx
 #else
+    std::cout << "调用asio_handler_invoke方法。" << std::endl;
   using asio::asio_handler_invoke;
   asio_handler_invoke(function, asio::detail::addressof(context));
 #endif

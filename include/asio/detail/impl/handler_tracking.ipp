@@ -290,6 +290,7 @@ void handler_tracking::reactor_operation(
     const tracked_handler& h, const char* op_name,
     const asio::error_code& ec)
 {
+    std::cout << "进入到handler_tracking reactor_operation方法１" << std::endl;
   handler_tracking_timestamp timestamp;
 
   write_line(
@@ -306,6 +307,7 @@ void handler_tracking::reactor_operation(
     const tracked_handler& h, const char* op_name,
     const asio::error_code& ec, std::size_t bytes_transferred)
 {
+    std::cout << "进入到handler_tracking reactor_operation方法 ２" << std::endl;
   handler_tracking_timestamp timestamp;
 
   write_line(

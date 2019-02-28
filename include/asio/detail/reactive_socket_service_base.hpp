@@ -332,10 +332,11 @@ public:
       const MutableBufferSequence& buffers,
       socket_base::message_flags flags, Handler& handler)
   {
-    std::cout << "detail/reactive_socket_service_base.hpp:331:i async_receive" << std::endl;
+    std::cout << "异步接受函数： async_receive" << std::endl;
 
     bool is_continuation = asio_handler_cont_helpers::is_continuation(handler);
 
+    std::cout << "创建reactor_op对象，封装perform/complete方法。" << std::endl;
     // Allocate and construct an operation to wrap the handler.
     typedef reactive_socket_recv_op<MutableBufferSequence, Handler> op;
     typename op::ptr p = { asio::detail::addressof(handler), op::ptr::allocate(handler), 0 };

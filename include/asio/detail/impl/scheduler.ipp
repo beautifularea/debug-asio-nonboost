@@ -390,6 +390,7 @@ std::size_t scheduler::do_run_one(mutex::scoped_lock& lock, scheduler::thread_in
             operation* o = op_queue_.front();
             op_queue_.pop();
             bool more_handlers = (!op_queue_.empty());
+
             std::cout << "还有　" << more_handlers << "　任务。" << std::endl;
 
             if (o == &task_operation_)
@@ -447,6 +448,9 @@ std::size_t scheduler::do_wait_one(mutex::scoped_lock& lock,
         scheduler::thread_info& this_thread, long usec,
         const asio::error_code& ec)
 {
+    std::cout << "进入到 scheduler 的 do_wait_one 方法。" << std::endl;
+    std::cout << "stopped_ : " << stopped_ << std::endl;
+
     if (stopped_)
         return 0;
 

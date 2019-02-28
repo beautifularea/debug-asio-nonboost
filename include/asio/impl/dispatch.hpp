@@ -28,6 +28,8 @@ template <typename CompletionToken>
 ASIO_INITFN_RESULT_TYPE(CompletionToken, void()) dispatch(
     ASIO_MOVE_ARG(CompletionToken) token)
 {
+    std::cout << "dispatch 方法1" << std::endl;
+
   typedef ASIO_HANDLER_TYPE(CompletionToken, void()) handler;
 
   async_completion<CompletionToken, void()> init(token);
@@ -48,6 +50,7 @@ ASIO_INITFN_RESULT_TYPE(CompletionToken, void()) dispatch(
     const Executor& ex, ASIO_MOVE_ARG(CompletionToken) token,
     typename enable_if<is_executor<Executor>::value>::type*)
 {
+    std::cout << "dispatch 方法2" << std::endl;
   typedef ASIO_HANDLER_TYPE(CompletionToken, void()) handler;
 
   async_completion<CompletionToken, void()> init(token);
@@ -67,6 +70,8 @@ inline ASIO_INITFN_RESULT_TYPE(CompletionToken, void()) dispatch(
     typename enable_if<is_convertible<
       ExecutionContext&, execution_context&>::value>::type*)
 {
+    
+    std::cout << "dispatch 方法3" << std::endl;
   return (dispatch)(ctx.get_executor(),
       ASIO_MOVE_CAST(CompletionToken)(token));
 }
