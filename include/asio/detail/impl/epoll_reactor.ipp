@@ -63,7 +63,7 @@ epoll_reactor::epoll_reactor(asio::execution_context& ctx)
   }
 
     std::cout << "0, 先创建epoll(epoll_creat1文件句柄。" << std::endl;
-    std::cout << "1，添加interrupter descriptor : " << interrupter_.read_descriptor() << " 到epoll." << std::endl;
+    std::cout << "1，添加interrupter descriptor(ET模式) : " << interrupter_.read_descriptor() << " 到epoll." << std::endl;
     std::cout << "2，添加timer descriptor : " << timer_fd_ << " 到epoll." << std::endl;
 }
 

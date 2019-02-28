@@ -50,7 +50,7 @@ public:
 
   static status do_perform(reactor_op* base)
   {
-    std::cout << "进入到reactive_socket_accept_op_base的do_perform函数。" << std::endl;
+    std::cout << "\n进入到reactive_socket_accept_op_base的do_perform函数。" << std::endl;
 
     reactive_socket_accept_op_base* o(static_cast<reactive_socket_accept_op_base*>(base));
 
@@ -61,6 +61,8 @@ public:
     o->new_socket_.reset(new_socket);
 
     ASIO_HANDLER_REACTOR_OPERATION((*o, "non_blocking_accept", o->ec_));
+
+    std::cout << "reactive_socket_accept_op_base的do_perform函数 返回。\n" << std::endl;
 
     return result;
   }

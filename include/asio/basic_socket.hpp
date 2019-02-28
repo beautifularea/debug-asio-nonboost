@@ -1282,6 +1282,8 @@ public:
    */
   bool native_non_blocking() const
   {
+    std::cout << "进入到native_non_blocking方法。" << std::endl;
+
     return this->get_service().native_non_blocking(this->get_implementation());
   }
 

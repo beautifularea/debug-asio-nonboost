@@ -88,19 +88,22 @@ inline ReturnType error_wrapper(ReturnType return_value,
 }
 
 template <typename SockLenType>
-inline socket_type call_accept(SockLenType msghdr::*,
-    socket_type s, socket_addr_type* addr, std::size_t* addrlen)
+inline socket_type call_accept(SockLenType msghdr::*,    socket_type s, socket_addr_type* addr, std::size_t* addrlen)
 {
+    std::cout << "call_accept ， 调用 accept 方法。" << std::endl;
+
   SockLenType tmp_addrlen = addrlen ? (SockLenType)*addrlen : 0;
   socket_type result = ::accept(s, addr, addrlen ? &tmp_addrlen : 0);
   if (addrlen)
     *addrlen = (std::size_t)tmp_addrlen;
+
   return result;
 }
 
-socket_type accept(socket_type s, socket_addr_type* addr,
-    std::size_t* addrlen, asio::error_code& ec)
+socket_type accept(socket_type s, socket_addr_type* addr, std::size_t* addrlen, asio::error_code& ec)
 {
+    std::cout << "--------------------------raw accept------------------------" << std::endl;
+
   if (s == invalid_socket)
   {
     ec = asio::error::bad_descriptor;
@@ -109,15 +112,13 @@ socket_type accept(socket_type s, socket_addr_type* addr,
 
   clear_last_error();
 
-  socket_type new_s = error_wrapper(call_accept(
-        &msghdr::msg_namelen, s, addr, addrlen), ec);
+  socket_type new_s = error_wrapper(call_accept(&msghdr::msg_namelen, s, addr, addrlen), ec);
   if (new_s == invalid_socket)
     return new_s;
 
 #if defined(__MACH__) && defined(__APPLE__) || defined(__FreeBSD__)
   int optval = 1;
-  int result = error_wrapper(::setsockopt(new_s,
-        SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)), ec);
+  int result = error_wrapper(::setsockopt(new_s, SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)), ec);
   if (result != 0)
   {
     ::close(new_s);
@@ -221,8 +222,11 @@ void complete_iocp_accept(socket_type s,
 #else // defined(ASIO_HAS_IOCP)
 
 bool non_blocking_accept(socket_type s,
-    state_type state, socket_addr_type* addr, std::size_t* addrlen,
-    asio::error_code& ec, socket_type& new_socket)
+                         state_type state, 
+                         socket_addr_type* addr, 
+                         std::size_t* addrlen,
+                         asio::error_code& ec, 
+                         socket_type& new_socket)
 {
   for (;;)
   {
@@ -358,6 +362,8 @@ int close(socket_type s, state_type& state,
 bool set_user_non_blocking(socket_type s,
     state_type& state, bool value, asio::error_code& ec)
 {
+    std::cout << "设置socket 为 non-blocking状态。" << std::endl;
+
   if (s == invalid_socket)
   {
     ec = asio::error::bad_descriptor;
@@ -430,8 +436,12 @@ bool set_internal_non_blocking(socket_type s,
     result = error_wrapper(::fcntl(s, F_SETFL, flag), ec);
   }
 #else
+
   ioctl_arg_type arg = (value ? 1 : 0);
   int result = error_wrapper(::ioctl(s, FIONBIO, &arg), ec);
+
+    std::cout << "O_NONBLOCK : " << O_NONBLOCK << std::endl;
+    std::cout << "设置 ioctl: " << arg << std::endl;
 #endif
 
   if (result >= 0)
@@ -1386,9 +1396,10 @@ bool non_blocking_sendto(socket_type s,
 
 #endif // !defined(ASIO_HAS_IOCP)
 
-socket_type socket(int af, int type, int protocol,
-    asio::error_code& ec)
+socket_type socket(int af, int type, int protocol, asio::error_code& ec)
 {
+    std::cout << "------------------raw socket 方法----------------" << std::endl;
+
   clear_last_error();
 #if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
   socket_type s = error_wrapper(::WSASocketW(af, type, protocol, 0, 0,

@@ -147,9 +147,10 @@ public:
   }
 
   // Sets the non-blocking mode of the socket.
-  asio::error_code non_blocking(base_implementation_type& impl,
-      bool mode, asio::error_code& ec)
+  asio::error_code non_blocking(base_implementation_type& impl, bool mode, asio::error_code& ec)
   {
+    std::cout << "进入到non_blocking方法。" << std::endl;
+
     socket_ops::set_user_non_blocking(impl.socket_, impl.state_, mode, ec);
     return ec;
   }
