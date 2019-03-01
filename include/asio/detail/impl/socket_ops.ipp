@@ -94,6 +94,7 @@ inline socket_type call_accept(SockLenType msghdr::*,    socket_type s, socket_a
 
   SockLenType tmp_addrlen = addrlen ? (SockLenType)*addrlen : 0;
   socket_type result = ::accept(s, addr, addrlen ? &tmp_addrlen : 0);
+  std::cout << "非阻塞的 raw accept 方法调用。" << std::endl;
   if (addrlen)
     *addrlen = (std::size_t)tmp_addrlen;
 

@@ -49,6 +49,8 @@ epoll_reactor::epoll_reactor(asio::execution_context& ctx)
 
   // Add the interrupter's descriptor to epoll.
   epoll_event ev = { 0, { 0 } };
+
+  //因为提前往中断的fd中写了8个字节的数据，如果采用默认的水平触发，则一直会产生中断。所以采用了边缘触发，收到数据再产生中断。
   ev.events = EPOLLIN | EPOLLERR | EPOLLET; //采用边缘触发，与8字节遥相呼应。
   ev.data.ptr = &interrupter_;
   epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, interrupter_.read_descriptor(), &ev);
@@ -556,7 +558,7 @@ void epoll_reactor::run(long usec, op_queue<operation>& ops)
         void* ptr = events[i].data.ptr;
         if (ptr == &interrupter_)
         {
-            std::cout << "interrupter 事件。" << std::endl;
+            std::cout << "捕获【interrupter 事件。】" << std::endl;
             // No need to reset the interrupter since we're leaving the descriptor
             // in a ready-to-read state and relying on edge-triggered notifications
             // to make it so that we only get woken up when the descriptor's epoll
@@ -574,11 +576,13 @@ void epoll_reactor::run(long usec, op_queue<operation>& ops)
         {
             check_timers = true;
 
-            std::cout << "timer 事件。" << std::endl;
+            std::cout << "捕获【timer 事件。】" << std::endl;
         }
 #endif // defined(ASIO_HAS_TIMERFD)
         else
         {
+
+            std::cout << "捕获【读写事件】。" << std::endl;
 
             // The descriptor operation doesn't count as work in and of itself, so we
             // don't call work_started() here. This still allows the scheduler to
@@ -586,15 +590,11 @@ void epoll_reactor::run(long usec, op_queue<operation>& ops)
             descriptor_state* descriptor_data = static_cast<descriptor_state*>(ptr);
             if (!ops.is_enqueued(descriptor_data))
             {
-                std::cout << "接收到事件，把descriptor_sate事件加入到 ops队列。" << std::endl;
-                
                 descriptor_data->set_ready_events(events[i].events);
                 ops.push(descriptor_data);
             }
             else
             {
-                std::cout << "当前事件已经准备好。" << std::endl;
-
                 descriptor_data->add_ready_events(events[i].events);
             }
         }
@@ -629,6 +629,8 @@ void epoll_reactor::interrupt()
 
 int epoll_reactor::do_epoll_create()
 {
+    std::cout << "创建epoll..." << std::endl;
+
 #if defined(EPOLL_CLOEXEC)
     int fd = epoll_create1(EPOLL_CLOEXEC);
 #else // defined(EPOLL_CLOEXEC)
@@ -638,7 +640,6 @@ int epoll_reactor::do_epoll_create()
 
     if (fd == -1 && (errno == EINVAL || errno == ENOSYS))
     {
-        std::cout << "创建epoll..." << std::endl;
         fd = epoll_create(epoll_size);
         if (fd != -1)
             ::fcntl(fd, F_SETFD, FD_CLOEXEC);
