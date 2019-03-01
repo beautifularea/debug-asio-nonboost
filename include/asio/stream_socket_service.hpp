@@ -358,6 +358,8 @@ public:
       socket_base::message_flags flags,
       ASIO_MOVE_ARG(WriteHandler) handler)
   {
+    std::cout << "进入到------async_send..." << std::endl;
+
     async_completion<WriteHandler,
       void (asio::error_code, std::size_t)> init(handler);
 

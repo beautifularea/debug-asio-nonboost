@@ -41,10 +41,13 @@ public:
       buffers_(buffers),
       flags_(flags)
   {
+    std::cout << "reactive_socket_send_op_base构造函数。" << std::endl;
   }
 
   static status do_perform(reactor_op* base)
   {
+    std::cout << "reactive_socket_send_op_base 的do_perform 方法。" << std::endl;
+
     reactive_socket_send_op_base* o(
         static_cast<reactive_socket_send_op_base*>(base));
 

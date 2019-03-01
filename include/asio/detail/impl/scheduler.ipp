@@ -36,15 +36,17 @@ struct scheduler::task_cleanup
   {
     if (this_thread_->private_outstanding_work > 0)
     {
-      asio::detail::increment(
-          scheduler_->outstanding_work_,
-          this_thread_->private_outstanding_work);
+      asio::detail::increment(scheduler_->outstanding_work_,  this_thread_->private_outstanding_work);
     }
+
     this_thread_->private_outstanding_work = 0;
 
     // Enqueue the completed operations and reinsert the task at the end of
     // the operation queue.
     lock_->lock();
+
+    std::cout << "在task_cleanup的析构函数中，把私有线程的任务队列push到op_queue_中。" << std::endl;
+
     scheduler_->task_interrupted_ = true;
     scheduler_->op_queue_.push(this_thread_->private_op_queue);
     scheduler_->op_queue_.push(&scheduler_->task_operation_);
@@ -286,8 +288,7 @@ void scheduler::compensating_work_started()
     ++static_cast<thread_info*>(this_thread)->private_outstanding_work;
 }
 
-void scheduler::post_immediate_completion(
-        scheduler::operation* op, bool is_continuation)
+void scheduler::post_immediate_completion(scheduler::operation* op, bool is_continuation)
 {
     std::cout << "进入到 scheduler 的　post_immediate_completion方法。" << std::endl;
 
@@ -309,6 +310,7 @@ void scheduler::post_immediate_completion(
 
     mutex::scoped_lock lock(mutex_);
     std::cout << "加入一个tast." << std::endl;
+
     op_queue_.push(op);
 
     wake_one_thread_and_unlock(lock);
@@ -398,11 +400,13 @@ std::size_t scheduler::do_run_one(mutex::scoped_lock& lock, scheduler::thread_in
 
                 task_interrupted_ = more_handlers;
 
+                //唤醒另外一个线程来执行其它任务，本线程接着处理epoll_reactor
                 if (more_handlers && !one_thread_)
                     wakeup_event_.unlock_and_signal_one(lock);
                 else
                     lock.unlock();
 
+                //干什么工作？
                 task_cleanup on_exit = { this, &lock, &this_thread };
                 (void)on_exit;
 

@@ -42,6 +42,7 @@ public:
   posix_thread(Function f, unsigned int = 0)
     : joined_(false)
   {
+    std::cout << "posix_thread构造函数, 同时开启线程。" << std::endl;
     start_thread(new func<Function>(f));
   }
 

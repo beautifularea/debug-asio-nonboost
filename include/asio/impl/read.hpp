@@ -249,6 +249,7 @@ namespace detail
         start_(other.start_),
         handler_(other.handler_)
     {
+        std::cout << "进入到read_op的复制构造方法。。。" << std::endl;
     }
 
     read_op(read_op&& other)
@@ -258,6 +259,7 @@ namespace detail
         start_(other.start_),
         handler_(ASIO_MOVE_CAST(ReadHandler)(other.handler_))
     {
+        std::cout << "进入到read_op的移动构造方法。。。" << std::endl;
     }
 #endif // defined(ASIO_HAS_MOVE)
 

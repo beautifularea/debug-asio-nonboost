@@ -223,8 +223,9 @@ public:
       const ConstBufferSequence& buffers,
       ASIO_MOVE_ARG(WriteHandler) handler)
   {
-    asio::async_completion<WriteHandler,
-      void (asio::error_code, std::size_t)> init(handler);
+    std::cout << "xxxxxxxxxxxxxxxxxxxx" << std::endl;
+
+    asio::async_completion<WriteHandler,void (asio::error_code, std::size_t)> init(handler);
 
     service_impl_.async_write_some(impl, buffers, init.completion_handler);
 

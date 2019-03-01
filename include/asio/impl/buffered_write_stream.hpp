@@ -361,22 +361,22 @@ buffered_write_stream<Stream>::async_write_some(
     const ConstBufferSequence& buffers,
     ASIO_MOVE_ARG(WriteHandler) handler)
 {
+    std::cout << "进入到buffered_write_stream的buffered_write_stream方法。" << std::endl;
+
   // If you get an error on the following line it means that your handler does
   // not meet the documented type requirements for a WriteHandler.
   ASIO_WRITE_HANDLER_CHECK(WriteHandler, handler) type_check;
 
-  async_completion<WriteHandler,
-    void (asio::error_code, std::size_t)> init(handler);
+  async_completion<WriteHandler, void (asio::error_code, std::size_t)> init(handler);
 
   using asio::buffer_size;
-  if (buffer_size(buffers) == 0
-      || storage_.size() < storage_.capacity())
+  if (buffer_size(buffers) == 0 || storage_.size() < storage_.capacity())
   {
-    next_layer_.async_write_some(ASIO_CONST_BUFFER(0, 0),
-        detail::buffered_write_some_handler<
-          ConstBufferSequence, ASIO_HANDLER_TYPE(
-            WriteHandler, void (asio::error_code, std::size_t))>(
-            storage_, buffers, init.completion_handler));
+    next_layer_.async_write_some(ASIO_CONST_BUFFER(0, 0), 
+                                 detail::buffered_write_some_handler<ConstBufferSequence, 
+                                                                     ASIO_HANDLER_TYPE(WriteHandler, void (asio::error_code, std::size_t))>(storage_, 
+                                                                                                                                            buffers,
+                                                                                                                                            init.completion_handler));
   }
   else
   {

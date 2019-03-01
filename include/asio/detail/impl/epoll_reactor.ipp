@@ -85,6 +85,7 @@ void epoll_reactor::shutdown()
 
   op_queue<operation> ops;
 
+    //state回收。
   while (descriptor_state* state = registered_descriptors_.first())
   {
     for (int i = 0; i < max_ops; ++i)
@@ -95,6 +96,7 @@ void epoll_reactor::shutdown()
 
   timer_queues_.get_all_timers(ops);
 
+    //放弃所有未处理的操作。
   scheduler_.abandon_operations(ops);
 }
 
@@ -164,14 +166,13 @@ void epoll_reactor::init_task()
     scheduler_.init_task();
 }
 
-int epoll_reactor::register_descriptor(socket_type descriptor,
-        epoll_reactor::per_descriptor_data& descriptor_data)
+int epoll_reactor::register_descriptor(socket_type descriptor, epoll_reactor::per_descriptor_data& descriptor_data)
 {
+    std::cout << "进入到register_descriptor方法。" << std::endl;
+
     descriptor_data = allocate_descriptor_state();
 
-    ASIO_HANDLER_REACTOR_REGISTRATION((
-                context(), static_cast<uintmax_t>(descriptor),
-                reinterpret_cast<uintmax_t>(descriptor_data)));
+    ASIO_HANDLER_REACTOR_REGISTRATION((context(), static_cast<uintmax_t>(descriptor), reinterpret_cast<uintmax_t>(descriptor_data)));
 
     {
         mutex::scoped_lock descriptor_lock(descriptor_data->mutex_);
@@ -179,6 +180,7 @@ int epoll_reactor::register_descriptor(socket_type descriptor,
         descriptor_data->reactor_ = this;
         descriptor_data->descriptor_ = descriptor;
         descriptor_data->shutdown_ = false;
+
         for (int i = 0; i < max_ops; ++i)
             descriptor_data->try_speculative_[i] = true;
     }
@@ -681,8 +683,7 @@ int epoll_reactor::do_timerfd_create()
 epoll_reactor::descriptor_state* epoll_reactor::allocate_descriptor_state()
 {
     mutex::scoped_lock descriptors_lock(registered_descriptors_mutex_);
-    return registered_descriptors_.alloc(ASIO_CONCURRENCY_HINT_IS_LOCKING(
-                REACTOR_IO, scheduler_.concurrency_hint()));
+    return registered_descriptors_.alloc(ASIO_CONCURRENCY_HINT_IS_LOCKING(REACTOR_IO, scheduler_.concurrency_hint()));
 }
 
 void epoll_reactor::free_descriptor_state(epoll_reactor::descriptor_state* s)

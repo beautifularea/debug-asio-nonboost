@@ -49,6 +49,7 @@ private:
   typedef conditionally_enabled_mutex mutex;
 
 public:
+    //操作的类型！
   enum op_types { read_op = 0, write_op = 1,
     connect_op = 1, except_op = 2, max_ops = 3 };
 

@@ -264,22 +264,23 @@ public:
       const ConstBufferSequence& buffers,
       socket_base::message_flags flags, Handler& handler)
   {
+    std::cout << "async_send中调用start_op" << std::endl;
     bool is_continuation =
       asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef reactive_socket_send_op<ConstBufferSequence, Handler> op;
-    typename op::ptr p = { asio::detail::addressof(handler),
-      op::ptr::allocate(handler), 0 };
+    typename op::ptr p = { asio::detail::addressof(handler), op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl.socket_, impl.state_, buffers, flags, handler);
 
-    ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "socket",
-          &impl, impl.socket_, "async_send"));
+    ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "socket", &impl, impl.socket_, "async_send"));
 
-    start_op(impl, reactor::write_op, p.p, is_continuation, true,
-        ((impl.state_ & socket_ops::stream_oriented)
-          && buffer_sequence_adapter<asio::const_buffer,
-            ConstBufferSequence>::all_empty(buffers)));
+    start_op(impl,
+             reactor::write_op, p.p, 
+             is_continuation, 
+             true,
+             ((impl.state_ & socket_ops::stream_oriented) && buffer_sequence_adapter<asio::const_buffer, ConstBufferSequence>::all_empty(buffers)));
+
     p.v = p.p = 0;
   }
 

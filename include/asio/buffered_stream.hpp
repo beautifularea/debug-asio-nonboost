@@ -172,12 +172,12 @@ public:
   /// lifetime of the asynchronous operation.
   template <typename ConstBufferSequence, typename WriteHandler>
   ASIO_INITFN_RESULT_TYPE(WriteHandler,
-      void (asio::error_code, std::size_t))
-  async_write_some(const ConstBufferSequence& buffers,
-      ASIO_MOVE_ARG(WriteHandler) handler)
+  void (asio::error_code, std::size_t))
+  async_write_some(const ConstBufferSequence& buffers, ASIO_MOVE_ARG(WriteHandler) handler)
   {
-    return stream_impl_.async_write_some(buffers,
-        ASIO_MOVE_CAST(WriteHandler)(handler));
+    std::cout << "调用 async_write_some 方法。" << std::endl;
+
+    return stream_impl_.async_write_some(buffers, ASIO_MOVE_CAST(WriteHandler)(handler));
   }
 
   /// Fill the buffer with some data. Returns the number of bytes placed in the

@@ -214,15 +214,14 @@ namespace detail
     : detail::base_from_completion_cond<CompletionCondition>
   {
   public:
-    write_op(AsyncWriteStream& stream, const ConstBufferSequence& buffers,
-        CompletionCondition completion_condition, WriteHandler& handler)
-      : detail::base_from_completion_cond<
-          CompletionCondition>(completion_condition),
+    write_op(AsyncWriteStream& stream, const ConstBufferSequence& buffers, CompletionCondition completion_condition, WriteHandler& handler)
+      : detail::base_from_completion_cond<CompletionCondition>(completion_condition),
         stream_(stream),
         buffers_(buffers),
         start_(0),
         handler_(ASIO_MOVE_CAST(WriteHandler)(handler))
     {
+        std::cout << "write_op 构造函数。" << std::endl;
     }
 
 #if defined(ASIO_HAS_MOVE)
@@ -242,11 +241,11 @@ namespace detail
         start_(other.start_),
         handler_(ASIO_MOVE_CAST(WriteHandler)(other.handler_))
     {
+        std::cout << "write_op移动构造函数。" << std::endl;
     }
 #endif // defined(ASIO_HAS_MOVE)
 
-    void operator()(const asio::error_code& ec,
-        std::size_t bytes_transferred, int start = 0)
+    void operator()(const asio::error_code& ec, std::size_t bytes_transferred, int start = 0)
     {
       std::size_t max_size;
       switch (start_ = start)
@@ -255,9 +254,10 @@ namespace detail
         max_size = this->check_for_completion(ec, buffers_.total_consumed());
         do
         {
-          stream_.async_write_some(buffers_.prepare(max_size),
-              ASIO_MOVE_CAST(write_op)(*this));
-          return; default:
+          stream_.async_write_some(buffers_.prepare(max_size), ASIO_MOVE_CAST(write_op)(*this));
+          return; 
+          
+          default:
           buffers_.consume(bytes_transferred);
           if ((!ec && bytes_transferred == 0) || buffers_.empty())
             break;
@@ -332,17 +332,17 @@ namespace detail
         function, this_handler->handler_);
   }
 
-  template <typename AsyncWriteStream, typename ConstBufferSequence,
-      typename ConstBufferIterator, typename CompletionCondition,
-      typename WriteHandler>
+  template <typename AsyncWriteStream, typename ConstBufferSequence, typename ConstBufferIterator, typename CompletionCondition, typename WriteHandler>
   inline void start_write_buffer_sequence_op(AsyncWriteStream& stream,
-      const ConstBufferSequence& buffers, const ConstBufferIterator&,
-      CompletionCondition completion_condition, WriteHandler& handler)
+                                             const ConstBufferSequence& buffers, 
+                                             const ConstBufferIterator&,
+                                             CompletionCondition completion_condition, 
+                                             WriteHandler& handler)
   {
-    detail::write_op<AsyncWriteStream, ConstBufferSequence,
-      ConstBufferIterator, CompletionCondition, WriteHandler>(
-        stream, buffers, completion_condition, handler)(
-          asio::error_code(), 0, 1);
+    std::cout << "start_write_buffer_sequence_op" << std::endl;
+
+    detail::write_op<AsyncWriteStream, ConstBufferSequence, ConstBufferIterator, CompletionCondition, WriteHandler>
+                (stream, buffers, completion_condition, handler)(asio::error_code(), 0, 1);
   }
 
 } // namespace detail
@@ -400,6 +400,7 @@ async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
       is_const_buffer_sequence<ConstBufferSequence>::value
     >::type*)
 {
+    std::cout << "异步async_write 方法 1" << std::endl;
   // If you get an error on the following line it means that your handler does
   // not meet the documented type requirements for a WriteHandler.
   ASIO_WRITE_HANDLER_CHECK(WriteHandler, handler) type_check;
@@ -424,16 +425,14 @@ async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
       is_const_buffer_sequence<ConstBufferSequence>::value
     >::type*)
 {
+    std::cout << "异步async_write 方法 2" << std::endl;
   // If you get an error on the following line it means that your handler does
   // not meet the documented type requirements for a WriteHandler.
   ASIO_WRITE_HANDLER_CHECK(WriteHandler, handler) type_check;
 
-  async_completion<WriteHandler,
-    void (asio::error_code, std::size_t)> init(handler);
+  async_completion<WriteHandler, void (asio::error_code, std::size_t)> init(handler);
 
-  detail::start_write_buffer_sequence_op(s, buffers,
-      asio::buffer_sequence_begin(buffers), transfer_all(),
-      init.completion_handler);
+  detail::start_write_buffer_sequence_op(s, buffers, asio::buffer_sequence_begin(buffers), transfer_all(), init.completion_handler);
 
   return init.result.get();
 }
@@ -602,6 +601,7 @@ async_write(AsyncWriteStream& s,
       is_dynamic_buffer<typename decay<DynamicBuffer>::type>::value
     >::type*)
 {
+    std::cout << "异步async_write 方法 3" << std::endl;
   return async_write(s,
       ASIO_MOVE_CAST(DynamicBuffer)(buffers),
       transfer_all(), ASIO_MOVE_CAST(WriteHandler)(handler));
@@ -619,6 +619,7 @@ async_write(AsyncWriteStream& s,
       is_dynamic_buffer<typename decay<DynamicBuffer>::type>::value
     >::type*)
 {
+    std::cout << "异步async_write 方法 4" << std::endl;
   // If you get an error on the following line it means that your handler does
   // not meet the documented type requirements for a WriteHandler.
   ASIO_WRITE_HANDLER_CHECK(WriteHandler, handler) type_check;
