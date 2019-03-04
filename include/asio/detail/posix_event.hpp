@@ -28,8 +28,7 @@
 namespace asio {
 namespace detail {
 
-class posix_event
-  : private noncopyable
+class posix_event : private noncopyable
 {
 public:
   // Constructor.
@@ -53,8 +52,11 @@ public:
   void signal_all(Lock& lock)
   {
     ASIO_ASSERT(lock.locked());
+
     (void)lock;
+
     state_ |= 1;
+
     ::pthread_cond_broadcast(&cond_); // Ignore EINVAL.
   }
 
@@ -63,9 +65,13 @@ public:
   void unlock_and_signal_one(Lock& lock)
   {
     ASIO_ASSERT(lock.locked());
+
     state_ |= 1;
+
     bool have_waiters = (state_ > 1);
+
     lock.unlock();
+
     if (have_waiters)
       ::pthread_cond_signal(&cond_); // Ignore EINVAL.
   }
@@ -146,6 +152,9 @@ public:
 private:
   ::pthread_cond_t cond_;
   std::size_t state_;
+  //state_作用：
+  //1, wait中作为条件控制判断的flag
+  //2, tate_ / 2 实际上就是当前处于等待状态的线程数; 参考 wait方法。
 };
 
 } // namespace detail

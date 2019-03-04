@@ -30,8 +30,7 @@ namespace detail {
 
 class posix_event;
 
-class posix_mutex
-  : private noncopyable
+class posix_mutex : private noncopyable
 {
 public:
   typedef asio::detail::scoped_lock<posix_mutex> scoped_lock;

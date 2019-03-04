@@ -57,8 +57,7 @@ void posix_thread::start_thread(func_base* arg)
 {
     std::cout << "创建pthread_create方法，创建线程。" << std::endl;
 
-  int error = ::pthread_create(&thread_, 0,
-        asio_detail_posix_thread_function, arg);
+  int error = ::pthread_create(&thread_, 0, asio_detail_posix_thread_function, arg);
   if (error != 0)
   {
     delete arg;

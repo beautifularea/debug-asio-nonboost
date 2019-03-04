@@ -42,6 +42,7 @@ resolver_service_base::resolver_service_base(
     work_(asio::make_work_guard(*work_io_context_)),
     work_thread_(0)
 {
+    std::cout << "resolver_servie_base构造函数。" << std::endl;
 }
 
 resolver_service_base::~resolver_service_base()

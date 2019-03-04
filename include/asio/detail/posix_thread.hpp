@@ -33,8 +33,7 @@ extern "C"
   ASIO_DECL void* asio_detail_posix_thread_function(void* arg);
 }
 
-class posix_thread
-  : private noncopyable
+class posix_thread : private noncopyable
 {
 public:
   // Constructor.

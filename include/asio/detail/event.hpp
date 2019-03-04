@@ -37,6 +37,7 @@ typedef null_event event;
 #elif defined(ASIO_WINDOWS)
 typedef win_event event;
 #elif defined(ASIO_HAS_PTHREADS)
+//使用pthread.
 typedef posix_event event;
 #elif defined(ASIO_HAS_STD_MUTEX_AND_CONDVAR)
 typedef std_event event;

@@ -99,7 +99,8 @@ scheduler::scheduler(asio::execution_context& ctx, int concurrency_hint)
     concurrency_hint_(concurrency_hint)
 {
     std::cout << "进入到scheduler的构造函数。" << std::endl;
-    std::cout << "concurrency_hit : " << concurrency_hint_ << std::endl;
+    std::cout << "创建线程个数   : " << concurrency_hint_ << std::endl;
+    std::cout << "one_thread变量 : " << one_thread_ << std::endl;
 
 
   ASIO_HANDLER_TRACKING_INIT;
@@ -402,11 +403,15 @@ std::size_t scheduler::do_run_one(mutex::scoped_lock& lock, scheduler::thread_in
 
                 //唤醒另外一个线程来执行其它任务，本线程接着处理epoll_reactor
                 if (more_handlers && !one_thread_)
+                {
+                    std::cout << "准备唤醒其他线程来执行任务。" << std::endl;
                     wakeup_event_.unlock_and_signal_one(lock);
+                }
                 else
                     lock.unlock();
 
                 //干什么工作？
+                //把局部thread在析构的过程中添加到全局op_queue,看thread_infod定义。
                 task_cleanup on_exit = { this, &lock, &this_thread };
                 (void)on_exit;
 
@@ -522,9 +527,7 @@ std::size_t scheduler::do_wait_one(mutex::scoped_lock& lock,
     return 1;
 }
 
-std::size_t scheduler::do_poll_one(mutex::scoped_lock& lock,
-        scheduler::thread_info& this_thread,
-        const asio::error_code& ec)
+std::size_t scheduler::do_poll_one(mutex::scoped_lock& lock, scheduler::thread_info& this_thread, const asio::error_code& ec)
 {
     if (stopped_)
         return 0;
@@ -589,9 +592,10 @@ void scheduler::stop_all_threads(
     }
 }
 
-void scheduler::wake_one_thread_and_unlock(
-        mutex::scoped_lock& lock)
+void scheduler::wake_one_thread_and_unlock(mutex::scoped_lock& lock)
 {
+    std::cout << "唤醒一个线程，并且解锁。" << std::endl;
+
     if (!wakeup_event_.maybe_unlock_and_signal_one(lock))
     {
         if (!task_interrupted_ && task_)

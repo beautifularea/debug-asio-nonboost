@@ -24,8 +24,7 @@
 namespace asio {
 namespace detail {
 
-class thread_info_base
-  : private noncopyable
+class thread_info_base : private noncopyable
 {
 public:
   struct default_tag
