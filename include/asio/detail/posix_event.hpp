@@ -70,6 +70,11 @@ public:
 
     bool have_waiters = (state_ > 1);
 
+    /*
+    关于unlock 和 signal顺序的问题，很多blog提到，要先 signal, 再 unlock, 与asio的实现相反???
+    我认为unlock->signal合理。先释放锁，然后在唤醒线程去竞争锁。
+    */
+
     lock.unlock();
 
     if (have_waiters)
