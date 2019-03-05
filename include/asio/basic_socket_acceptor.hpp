@@ -67,11 +67,8 @@ namespace asio {
  * acceptor.listen();
  * @endcode
  */
-template <typename Protocol
-    ASIO_SVC_TPARAM_DEF1(= socket_acceptor_service<Protocol>)>
-class basic_socket_acceptor
-  : ASIO_SVC_ACCESS basic_io_object<ASIO_SVC_T>,
-    public socket_base
+template <typename Protocol ASIO_SVC_TPARAM_DEF1(= socket_acceptor_service<Protocol>)>
+class basic_socket_acceptor : ASIO_SVC_ACCESS basic_io_object<ASIO_SVC_T>, public socket_base
 {
 public:
   /// The type of the executor associated with the object.
@@ -121,7 +118,7 @@ public:
       const protocol_type& protocol)
     : basic_io_object<ASIO_SVC_T>(io_context)
   {
-    std::cout << "basic_socket_acceptor 构造函数。" << std::endl;
+    std::cout << "basic_socket_acceptor 构造函数。继承自basic_io_object 和 socket_base " << std::endl;
 
     asio::error_code ec;
     this->get_service().open(this->get_implementation(), protocol, ec);
@@ -155,24 +152,30 @@ public:
    * acceptor.listen(listen_backlog);
    * @endcode
    */
-  basic_socket_acceptor(asio::io_context& io_context,
-      const endpoint_type& endpoint, bool reuse_addr = true)
+  basic_socket_acceptor(asio::io_context& io_context, const endpoint_type& endpoint, bool reuse_addr = true)
     : basic_io_object<ASIO_SVC_T>(io_context)
   {
+    std::cout << "tcp::acceptor 构造函数。" << std::endl;
+
     asio::error_code ec;
     const protocol_type protocol = endpoint.protocol();
+
     this->get_service().open(this->get_implementation(), protocol, ec);
     asio::detail::throw_error(ec, "open");
     if (reuse_addr)
     {
-      this->get_service().set_option(this->get_implementation(),
-          socket_base::reuse_address(true), ec);
+        std::cout << "设置地址reuse" << std::endl;
+
+      this->get_service().set_option(this->get_implementation(), socket_base::reuse_address(true), ec);
       asio::detail::throw_error(ec, "set_option");
     }
+
+    std::cout << "绑定到当前endpoint" << std::endl;
     this->get_service().bind(this->get_implementation(), endpoint, ec);
     asio::detail::throw_error(ec, "bind");
-    this->get_service().listen(this->get_implementation(),
-        socket_base::max_listen_connections, ec);
+
+    std::cout << "开始监听listen..." << std::endl;
+    this->get_service().listen(this->get_implementation(), socket_base::max_listen_connections, ec);
     asio::detail::throw_error(ec, "listen");
   }
 

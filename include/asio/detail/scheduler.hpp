@@ -182,7 +182,7 @@ private:
   struct task_operation : operation
   {
     task_operation() : operation(0) {}
-  } task_operation_;
+  } task_operation_; //在哪里初始化的???
 
   // Whether the task has been interrupted.
   bool task_interrupted_;

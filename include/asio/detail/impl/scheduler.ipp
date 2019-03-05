@@ -310,7 +310,7 @@ void scheduler::post_immediate_completion(scheduler::operation* op, bool is_cont
     work_started();
 
     mutex::scoped_lock lock(mutex_);
-    std::cout << "加入一个tast." << std::endl;
+    std::cout << "在post_immediate_completion中，把当前operation加到全局op_queue中。" << std::endl;
 
     op_queue_.push(op);
 
@@ -381,6 +381,7 @@ void scheduler::abandon_operations(
 std::size_t scheduler::do_run_one(mutex::scoped_lock& lock, scheduler::thread_info& this_thread, const asio::error_code& ec)
 {
     std::cout << "\n--------------------------------------进入到 scheduler的　do_run_one　方法。-----------------------------------------" << std::endl;
+    std::cout << "当前线程ID = " << pthread_self() << std::endl;
     while (!stopped_)
     {
         std::cout << "\n...进入事件循环..." << std::endl;

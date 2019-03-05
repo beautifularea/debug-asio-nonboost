@@ -1165,9 +1165,9 @@ bool non_blocking_recvmsg(socket_type s,
 
 #endif // defined(ASIO_HAS_IOCP)
 
-signed_size_type send(socket_type s, const buf* bufs, size_t count,
-    int flags, asio::error_code& ec)
+signed_size_type send(socket_type s, const buf* bufs, size_t count, int flags, asio::error_code& ec)
 {
+    std::cout << "进入到send方法，调用::sendmsg来发送数据。。。" << std::endl;
   clear_last_error();
 #if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
   // Send the data.
@@ -1262,8 +1262,10 @@ bool non_blocking_send(socket_type s,
     const buf* bufs, size_t count, int flags,
     asio::error_code& ec, size_t& bytes_transferred)
 {
+    std::cout << "真正的non_blocking_send方法。" << std::endl;
   for (;;)
   {
+    std::cout << "-------------循环发送------------" << std::endl;
     // Write some data.
     signed_size_type bytes = socket_ops::send(s, bufs, count, flags, ec);
 
@@ -1281,6 +1283,7 @@ bool non_blocking_send(socket_type s,
     {
       ec = asio::error_code();
       bytes_transferred = bytes;
+      std::cout << "发送完成的字节数 : " << bytes_transferred << std::endl;
     }
     else
       bytes_transferred = 0;
@@ -1291,9 +1294,7 @@ bool non_blocking_send(socket_type s,
 
 #endif // defined(ASIO_HAS_IOCP)
 
-signed_size_type sendto(socket_type s, const buf* bufs, size_t count,
-    int flags, const socket_addr_type* addr, std::size_t addrlen,
-    asio::error_code& ec)
+signed_size_type sendto(socket_type s, const buf* bufs, size_t count,  int flags, const socket_addr_type* addr, std::size_t addrlen, asio::error_code& ec)
 {
   clear_last_error();
 #if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
@@ -1320,6 +1321,8 @@ signed_size_type sendto(socket_type s, const buf* bufs, size_t count,
 #if defined(__linux__)
   flags |= MSG_NOSIGNAL;
 #endif // defined(__linux__)
+
+    std::cout << "-----最终调用sendmsg发送数据." << std::endl;
   signed_size_type result = error_wrapper(::sendmsg(s, &msg, flags), ec);
   if (result >= 0)
     ec = asio::error_code();
@@ -1367,19 +1370,19 @@ bool non_blocking_sendto(socket_type s,
     const socket_addr_type* addr, std::size_t addrlen,
     asio::error_code& ec, size_t& bytes_transferred)
 {
+    std::cout << "进入到non_blocking_send-------" << std::endl;
   for (;;)
   {
+    std::cout << "-----循环发送-----" << std::endl;
     // Write some data.
-    signed_size_type bytes = socket_ops::sendto(
-        s, bufs, count, flags, addr, addrlen, ec);
+    signed_size_type bytes = socket_ops::sendto(s, bufs, count, flags, addr, addrlen, ec);
 
     // Retry operation if interrupted by signal.
     if (ec == asio::error::interrupted)
       continue;
 
     // Check if we need to run the operation again.
-    if (ec == asio::error::would_block
-        || ec == asio::error::try_again)
+    if (ec == asio::error::would_block || ec == asio::error::try_again)
       return false;
 
     // Operation is complete.

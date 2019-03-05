@@ -48,23 +48,22 @@ public:
   {
     std::cout << "reactive_socket_send_op_base 的do_perform 方法。" << std::endl;
 
-    reactive_socket_send_op_base* o(
-        static_cast<reactive_socket_send_op_base*>(base));
+    //准备发送operation
+    reactive_socket_send_op_base* o(static_cast<reactive_socket_send_op_base*>(base));
 
-    buffer_sequence_adapter<asio::const_buffer,
-        ConstBufferSequence> bufs(o->buffers_);
+    //buffer
+    buffer_sequence_adapter<asio::const_buffer, ConstBufferSequence> bufs(o->buffers_);
 
-    status result = socket_ops::non_blocking_send(o->socket_,
-          bufs.buffers(), bufs.count(), o->flags_,
-          o->ec_, o->bytes_transferred_) ? done : not_done;
+    std::cout << "-----调用非阻塞发送方法: non_blocking_send" << std::endl;
+    status result = socket_ops::non_blocking_send(o->socket_, bufs.buffers(), bufs.count(), o->flags_, o->ec_, o->bytes_transferred_) ? done : not_done;
+    std::cout << "调用非阻塞发送方法: non_blocking_send 完毕----" << std::endl;
 
     if (result == done)
       if ((o->state_ & socket_ops::stream_oriented) != 0)
         if (o->bytes_transferred_ < bufs.total_size())
           result = done_and_exhausted;
 
-    ASIO_HANDLER_REACTOR_OPERATION((*o, "non_blocking_send",
-          o->ec_, o->bytes_transferred_));
+    ASIO_HANDLER_REACTOR_OPERATION((*o, "non_blocking_send", o->ec_, o->bytes_transferred_));
 
     return result;
   }

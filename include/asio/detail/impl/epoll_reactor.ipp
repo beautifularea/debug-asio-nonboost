@@ -283,7 +283,7 @@ void epoll_reactor::start_op(int op_type,
         {
             if (descriptor_data->try_speculative_[op_type])
             {
-                std::cout << "调用perform，看reactor_op的状态。" << std::endl;
+                std::cout << "在perform注册函数中执行。真正的发送方法, 。。" << std::endl;
                 if (reactor_op::status status = op->perform())
                 {
                     if (status == reactor_op::done_and_exhausted)
@@ -509,7 +509,7 @@ void epoll_reactor::run(long usec, op_queue<operation>& ops)
 
     // Block on the epoll descriptor.
     epoll_event events[128];
-    std::cout << "epoll_wait..." << std::endl;
+    std::cout << "epoll_wait... thread ID : " << pthread_self() << std::endl;
     int num_events = epoll_wait(epoll_fd_, events, 128, timeout);
 
 #if defined(ASIO_ENABLE_HANDLER_TRACKING)
