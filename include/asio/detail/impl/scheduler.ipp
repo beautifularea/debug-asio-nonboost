@@ -49,7 +49,8 @@ struct scheduler::task_cleanup
 
     scheduler_->task_interrupted_ = true;
     scheduler_->op_queue_.push(this_thread_->private_op_queue);
-    scheduler_->op_queue_.push(&scheduler_->task_operation_);
+    scheduler_->op_queue_.push(&scheduler_->task_operation_); 
+    //在这里把成员变量task_operation_加入到op_queue_中，run的时候，区分一下是不是当前的task_operation,看上面的 this_thread_private_op_queue，每个描述符都有自己的私有队列，也push到全局op_queue_中。
   }
 
   scheduler* scheduler_;
@@ -419,7 +420,7 @@ std::size_t scheduler::do_run_one(mutex::scoped_lock& lock, scheduler::thread_in
                 // Run the task. May throw an exception. Only block if the operation
                 // queue is empty and we're not polling, otherwise we want to return
                 // as soon as possible.
-                std::cout << "调用　task的run 方法。" << std::endl;
+                std::cout << "调用run 方法。" << std::endl;
                 task_->run(more_handlers ? 0 : -1, this_thread.private_op_queue);
             }
             else
@@ -435,7 +436,7 @@ std::size_t scheduler::do_run_one(mutex::scoped_lock& lock, scheduler::thread_in
                 work_cleanup on_exit = { this, &lock, &this_thread };
                 (void)on_exit;
 
-                std::cout << "不是　task_operation 类型，调用 opeartion->complete" << std::endl;
+                std::cout << "异步任务完成，调用回调函数到调用层。" << std::endl;
                 // Complete the operation. May throw an exception. Deletes the object.
                 o->complete(this, ec, task_result);
 
