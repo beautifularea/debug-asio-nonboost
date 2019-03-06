@@ -179,6 +179,7 @@ private:
   reactor* task_;
 
   // Operation object to represent the position of the task in the queue.
+  //task_operation_是个空的包装类，仅代表每个scheduler它的epoll_reactor的占位符
   struct task_operation : operation
   {
     task_operation() : operation(0) {}

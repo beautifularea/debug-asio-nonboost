@@ -49,6 +49,9 @@ struct scheduler::task_cleanup
 
     scheduler_->task_interrupted_ = true;
     scheduler_->op_queue_.push(this_thread_->private_op_queue);
+    
+    std::cout << "scheduler 中 task_operation_ ： " << scheduler_->task_operation_ << std::endl;
+
     scheduler_->op_queue_.push(&scheduler_->task_operation_); 
     //在这里把成员变量task_operation_加入到op_queue_中，run的时候，区分一下是不是当前的task_operation,看上面的 this_thread_private_op_queue，每个描述符都有自己的私有队列，也push到全局op_queue_中。
   }
@@ -64,9 +67,7 @@ struct scheduler::work_cleanup
   {
     if (this_thread_->private_outstanding_work > 1)
     {
-      asio::detail::increment(
-          scheduler_->outstanding_work_,
-          this_thread_->private_outstanding_work - 1);
+      asio::detail::increment(scheduler_->outstanding_work_, this_thread_->private_outstanding_work - 1);
     }
     else if (this_thread_->private_outstanding_work < 1)
     {
@@ -268,6 +269,8 @@ std::size_t scheduler::poll_one(asio::error_code& ec)
 
 void scheduler::stop()
 {
+    std::cout << "scheduler任务完成了，stop所有线程。" << std::endl;
+
     mutex::scoped_lock lock(mutex_);
     stop_all_threads(lock);
 }
@@ -397,9 +400,10 @@ std::size_t scheduler::do_run_one(mutex::scoped_lock& lock, scheduler::thread_in
 
             //std::cout << "还有　" << more_handlers << "　任务。" << std::endl;
 
+            //当从队列中取出的op是这个task_operation_时，则说明scheduler该处理epoll_reactor了
             if (o == &task_operation_)
             {
-                std::cout << "类型是 task_operation " << std::endl;
+                std::cout << "开始处理epoll_reactor... " << std::endl;
 
                 task_interrupted_ = more_handlers;
 
@@ -581,15 +585,16 @@ std::size_t scheduler::do_poll_one(mutex::scoped_lock& lock, scheduler::thread_i
     return 1;
 }
 
-void scheduler::stop_all_threads(
-        mutex::scoped_lock& lock)
+void scheduler::stop_all_threads(mutex::scoped_lock& lock)
 {
     stopped_ = true;
+
     wakeup_event_.signal_all(lock);
 
     if (!task_interrupted_ && task_)
     {
         task_interrupted_ = true;
+
         task_->interrupt();
     }
 }
