@@ -238,6 +238,7 @@ class coroutine_ref;
  * @li @c ASIO_CORO_YIELD instead of @c yield
  * @li @c ASIO_CORO_FORK instead of @c fork
  */
+ //stackless 
 class coroutine
 {
 public:

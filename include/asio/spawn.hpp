@@ -28,6 +28,7 @@
 
 #include "asio/detail/push_options.hpp"
 
+//stackful
 namespace asio {
 
 /// Context object the represents the currently executing coroutine.
