@@ -19,11 +19,11 @@ int main()
 
     std::cout << "call foo(1) ..." << std::endl;
     foo(1);
-    std::cout << "end foo(1) ..." << std::endl;
+    std::cout << "end foo(1) ...\n" << std::endl;
 
     std::cout << "call foo(2) ..." << std::endl;
     foo(2);
-    std::cout << "end foo(2) ..." << std::endl;
+    std::cout << "end foo(2) ...\n" << std::endl;
 
     std::cout << "call foo(3) ..." << std::endl;
     foo(3);

@@ -278,6 +278,14 @@ private:
 } // namespace detail
 } // namespace asio
 
+/*
+宏定义真是能写成各样个式的！乍一看没理解 case 0那个是什么情况。原来是自己定义的携程执行代码。
+
+reenter(c){
+    //这里就是 case 0的部分。包括{}
+}
+
+*/
 #define ASIO_CORO_REENTER(c) \
   switch (::asio::detail::coroutine_ref _coro_value = c) \
     case -1: if (_coro_value) \
