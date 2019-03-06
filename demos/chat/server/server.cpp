@@ -17,6 +17,7 @@
 #include <utility>
 #include "asio.hpp"
 #include "../message.hpp"
+#include <thread>
 
 using asio::ip::tcp;
 
@@ -101,10 +102,13 @@ private:
   void do_read_header()
   {
     auto self(shared_from_this());
+    std::cout << "-------开始异步读取header----------" << std::endl;
     asio::async_read(socket_,
         asio::buffer(read_msg_.data(), chat_message::header_length),
         [this, self](std::error_code ec, std::size_t /*length*/)
         {
+            std::cout << "header读取完毕。" << std::endl;
+
           if (!ec && read_msg_.decode_header())
           {
             do_read_body();
@@ -114,15 +118,20 @@ private:
             room_.leave(shared_from_this());
           }
         });
+    std::cout << "-----结束异步读取header---------" << std::endl;
   }
 
   void do_read_body()
   {
     auto self(shared_from_this());
+
+    std::cout << "-------开始异步读取body----------" << std::endl;
     asio::async_read(socket_,
         asio::buffer(read_msg_.body(), read_msg_.body_length()),
         [this, self](std::error_code ec, std::size_t /*length*/)
         {
+            std::cout << "读取body完成。" << std::endl;
+
           if (!ec)
           {
             room_.deliver(read_msg_);
@@ -133,16 +142,21 @@ private:
             room_.leave(shared_from_this());
           }
         });
+
+    std::cout << "-----结束异步读取body---------" << std::endl;
   }
 
   void do_write()
   {
     auto self(shared_from_this());
+
+    std::cout << "-------------------开始异步写操作-------------------" << std::endl;
     asio::async_write(socket_,
         asio::buffer(write_msgs_.front().data(),
           write_msgs_.front().length()),
         [this, self](std::error_code ec, std::size_t /*length*/)
         {
+            std::cout << "server 中写完成的回调。" << std::endl;
           if (!ec)
           {
             write_msgs_.pop_front();
@@ -156,6 +170,8 @@ private:
             room_.leave(shared_from_this());
           }
         });
+
+    std::cout << "--------------------结束异步写操作------------------" << std::endl;
   }
 
   tcp::socket socket_;
@@ -169,26 +185,30 @@ private:
 class chat_server
 {
 public:
-  chat_server(asio::io_context& io_context,
-      const tcp::endpoint& endpoint)
+  chat_server(asio::io_context& io_context, const tcp::endpoint& endpoint)
     : acceptor_(io_context, endpoint)
   {
-    do_accept();
+        do_accept();
   }
 
 private:
   void do_accept()
   {
+    std::cout << "\n\n作为服务器，准备开始接受client的链接..." << std::endl;
+    std::cout << "使用async_accept开启..." << std::endl;
     acceptor_.async_accept(
         [this](std::error_code ec, tcp::socket socket)
         {
+            
           if (!ec)
           {
+            std::cout << "接收到新链接过来，创建房间..." << std::endl;
             std::make_shared<chat_session>(std::move(socket), room_)->start();
           }
 
           do_accept();
         });
+    std::cout << "作为异步接收，立即返回。\n\n" << std::endl;
   }
 
   tcp::acceptor acceptor_;
@@ -197,8 +217,18 @@ private:
 
 //----------------------------------------------------------------------
 
+void thread_2_f(void)
+{
+  {
+    std::cout << "作为服务器，开始 io_context.run() 2 方法。" << std::endl;
+    asio::io_context io_context;
+    io_context.run();
+  }
+}
+
 int main(int argc, char* argv[])
 {
+
   try
   {
     if (argc < 2)
@@ -210,18 +240,22 @@ int main(int argc, char* argv[])
     asio::io_context io_context;
 
     std::list<chat_server> servers;
-    for (int i = 1; i < argc; ++i)
+    //for (int i = 1; i < argc; ++i)
     {
-      tcp::endpoint endpoint(tcp::v4(), std::atoi(argv[i]));
+      tcp::endpoint endpoint(tcp::v4(), std::atoi(argv[1]));
       servers.emplace_back(io_context, endpoint);
     }
 
+    std::cout << "作为服务器，开始 io_context.run()方法。" << std::endl;
     io_context.run();
   }
   catch (std::exception& e)
   {
     std::cerr << "Exception: " << e.what() << "\n";
   }
+
+//    std::thread thread_2(thread_2_f);
+//    thread_2.join();
 
   return 0;
 }

@@ -1,1 +1,6 @@
 *.swp
+demo
+./demo/chat/client/CMakeFiles/*
+./demo/chat/server/CMakeFiles/*
+t
+

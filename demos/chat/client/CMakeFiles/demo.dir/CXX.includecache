@@ -1665,6 +1665,8 @@ sys/timerfd.h
 -
 asio/detail/push_options.hpp
 ../../../include/asio/detail/impl/asio/detail/push_options.hpp
+iostream
+-
 asio/detail/pop_options.hpp
 ../../../include/asio/detail/impl/asio/detail/pop_options.hpp
 
@@ -1873,6 +1875,8 @@ asio/detail/reactive_socket_service_base.hpp
 ../../../include/asio/detail/impl/asio/detail/reactive_socket_service_base.hpp
 asio/detail/push_options.hpp
 ../../../include/asio/detail/impl/asio/detail/push_options.hpp
+iostream
+-
 asio/detail/pop_options.hpp
 ../../../include/asio/detail/impl/asio/detail/pop_options.hpp
 
@@ -1903,6 +1907,8 @@ asio/detail/scheduler_thread_info.hpp
 ../../../include/asio/detail/impl/asio/detail/scheduler_thread_info.hpp
 asio/detail/push_options.hpp
 ../../../include/asio/detail/impl/asio/detail/push_options.hpp
+iostream
+-
 asio/detail/pop_options.hpp
 ../../../include/asio/detail/impl/asio/detail/pop_options.hpp
 
@@ -3773,6 +3779,8 @@ asio/detail/winapp_thread.hpp
 ../../../include/asio/detail/asio/detail/winapp_thread.hpp
 asio/detail/win_thread.hpp
 ../../../include/asio/detail/asio/detail/win_thread.hpp
+iostream
+-
 asio/detail/posix_thread.hpp
 ../../../include/asio/detail/asio/detail/posix_thread.hpp
 asio/detail/std_thread.hpp
@@ -5851,6 +5859,8 @@ asio/detail/signal_init.hpp
 ../../../include/asio/asio/detail/signal_init.hpp
 asio/detail/push_options.hpp
 ../../../include/asio/asio/detail/push_options.hpp
+iostream
+-
 asio/detail/pop_options.hpp
 ../../../include/asio/asio/detail/pop_options.hpp
 asio/impl/io_context.hpp
